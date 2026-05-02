@@ -21,7 +21,7 @@ st.set_page_config(
 def init_connection():
     scope = [
         "https://spreadsheets.google.com/feeds",
-        "https://www.googleapis.com/auth/drive"
+        "https://www.googleapis.com/auth/drive"git 
     ]
 
     creds_dict = dict(st.secrets["gcp_service_account"])
@@ -33,13 +33,14 @@ def init_connection():
     return client
 
 client = init_connection()
-sheet = client.open("progress report - original").sheet1
+
 
 # -----------------------------
 # LOAD DATA
 # -----------------------------
 @st.cache_data
-def load_data(sheet):
+def load_data():
+    sheet = client.open("progress report - original").sheet1
     data = sheet.get_all_records()
     df = pd.DataFrame(data)
 
@@ -53,7 +54,7 @@ def load_data(sheet):
     return df
 
 
-df = load_data(sheet)
+df = load_data()
 
 # -----------------------------
 # BACKGROUND COLOR
