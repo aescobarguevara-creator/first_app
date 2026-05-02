@@ -38,9 +38,12 @@ client = init_connection()
 # -----------------------------
 # LOAD DATA
 # -----------------------------
+
+sheet = client.open("progress report - original").sheet1
+
 @st.cache_data
 def load_data():
-    sheet = client.open("progress report - original").sheet1
+
     data = sheet.get_all_records()
     df = pd.DataFrame(data)
 
