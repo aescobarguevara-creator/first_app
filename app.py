@@ -44,7 +44,15 @@ def load_data():
     data = sheet.get_all_records()
     df = pd.DataFrame(data)
 
-    df["Completed"] = df["Completed"].fillna(0).astype(bool)
+    df["Completed"] = (
+        df["Completed"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+        .map({"true": True, "false": False})
+        .astype("boolean")   # optional
+    )
+
     df["Comments"] = df["Comments"].fillna("").astype(str)
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 
