@@ -4,6 +4,7 @@ import time
 import os
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from datetime import datetime
 
 
 # -----------------------------
@@ -274,6 +275,7 @@ if st.button("Save Changes"):
     # 2. MERGE BACK WITH ORIGINAL DATA
     # -----------------------------
     df_updated = df.copy()
+    today = datetime.today().date()
 
     for _, row in df_melted.iterrows():
         mask = (
@@ -282,6 +284,22 @@ if st.button("Save Changes"):
         )
 
         df_updated.loc[mask, "Completed"] = row["Completed"]
+
+
+    for _, row in df_melted.iterrows():
+
+        mask = (
+            (df_updated["Key"] == row["Key"]) &
+            (df_updated["Rule of credit"] == row["Rule of credit"])
+        )
+
+        old_value = df.loc[mask, "Completed"].values[0]
+        new_value = row["Completed"]
+
+        # If checkbox was just checked → stamp date
+        if (old_value is False) and (new_value is True):
+            df_updated.loc[mask, "Date"] = today
+
 
 
 
