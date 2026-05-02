@@ -21,7 +21,7 @@ st.set_page_config(
 def init_connection():
     scope = [
         "https://spreadsheets.google.com/feeds",
-        "https://www.googleapis.com/auth/drive"git 
+        "https://www.googleapis.com/auth/drive"
     ]
 
     creds_dict = dict(st.secrets["gcp_service_account"])
