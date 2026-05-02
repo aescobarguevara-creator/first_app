@@ -300,8 +300,8 @@ if st.button("Save Changes"):
         if (old_value is False) and (new_value is True):
             df_updated.loc[mask, "Date"] = today
 
-
-
+        elif (old_value is True) and (new_value is False):
+            df_updated.loc[mask, "Date"] = None
 
     for roc, date, comment in updated_rows:
 
