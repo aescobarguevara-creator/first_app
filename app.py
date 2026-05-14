@@ -275,7 +275,7 @@ if st.button("Save Changes"):
     # 2. MERGE BACK WITH ORIGINAL DATA
     # -----------------------------
     df_updated = df.copy()
-    today = datetime.today().date()
+    today = pd.Timestamp.today().normalize()
 
     for _, row in df_melted.iterrows():
         mask = (
@@ -301,7 +301,7 @@ if st.button("Save Changes"):
             df_updated.loc[mask, "Date"] = today
 
         elif (old_value == True) and (new_value == False):
-            df_updated.loc[mask, "Date"] = None
+            df_updated.loc[mask, "Date"] = pd.NaT
 
     for roc, date, comment in updated_rows:
 
