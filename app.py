@@ -174,8 +174,15 @@ df_pivot[roc_cols] = df_pivot[roc_cols].astype(bool)
 st.markdown("### Work Items")
 
 column_config = {
-    col: st.column_config.CheckboxColumn(col)
-    for col in roc_cols
+    "Key": st.column_config.Column(
+        "Key",
+        width="small",
+        disabled=True
+    ),
+    **{
+        col: st.column_config.CheckboxColumn(col)
+        for col in roc_cols
+    }
 }
 
 
