@@ -142,12 +142,20 @@ df_filtered = df4[df4["Task"].isin(selected_tasks)]
 # Pivoting table
 # -----------------------------
 
+roc_order = df_filtered["Rule of credit"].drop_duplicates().tolist()
+
+df_filtered["Rule of credit"] = pd.Categorical(
+    df_filtered["Rule of credit"],
+    categories=roc_order,
+    ordered=True
+
 df_pivot = df_filtered.pivot_table(
     index=["Key","Widget"],
     columns="Rule of credit",
     values="Completed",
     aggfunc="sum",
-    fill_value = False
+    fill_value = False,
+    sorted=False
 ).reset_index()
 
 # flatten columns
