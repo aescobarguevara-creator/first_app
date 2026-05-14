@@ -310,7 +310,7 @@ if st.button("Save Changes"):
                 (df_updated["Rule of credit"] == roc)
             )
 
-            df_updated.loc[mask, "Date"] = date
+            # df_updated.loc[mask, "Date"] = date
             df_updated.loc[mask, "Comments"] = comment
 
 
@@ -339,3 +339,8 @@ if st.button("Save Changes"):
 
 # Run on network
 # py -m streamlit run progress_v6.py --server.address 0.0.0.0 --server.port 8501
+
+# Push to GitHub
+git add .
+git commit -m "update"
+git push origin main
