@@ -341,6 +341,6 @@ if st.button("Save Changes"):
 # py -m streamlit run progress_v6.py --server.address 0.0.0.0 --server.port 8501
 
 # Push to GitHub
-git add .
-git commit -m "update"
-git push origin main
+# git add .
+# git commit -m "update"
+# git push origin main
