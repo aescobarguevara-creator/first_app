@@ -297,10 +297,10 @@ if st.button("Save Changes"):
         new_value = row["Completed"]
 
         # If checkbox was just checked → stamp date
-        if (old_value is False) and (new_value is True):
+        if (old_value == False) and (new_value == True):
             df_updated.loc[mask, "Date"] = today
 
-        elif (old_value is True) and (new_value is False):
+        elif (old_value == True) and (new_value == False):
             df_updated.loc[mask, "Date"] = None
 
     for roc, date, comment in updated_rows:
