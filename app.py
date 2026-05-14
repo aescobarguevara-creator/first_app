@@ -155,8 +155,7 @@ df_pivot = df_filtered.pivot_table(
     columns="Rule of credit",
     values="Completed",
     aggfunc="sum",
-    fill_value = False,
-    sorted=False
+    fill_value = False
 ).reset_index()
 
 # flatten columns
