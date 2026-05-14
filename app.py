@@ -170,12 +170,17 @@ column_config = {
     for col in roc_cols
 }
 
-edited_df = st.data_editor(
-    df_pivot,
-    width="stretch",
-    num_rows="dynamic",
-    column_config=column_config
-)
+
+with st.form("progress_form"):
+
+    edited_df = st.data_editor(
+        df_pivot,
+        width="stretch",
+        num_rows="dynamic",
+        column_config=column_config
+    )
+
+    submitted = st.form_submit_button("Save Changes")
 
 # ----------------------
 # MASTER - DETAIL FORM
@@ -253,7 +258,7 @@ else:
 # SAVE CHANGES
 # -----------------------------
 
-if st.button("Save Changes"):
+if submitted:
 
     # Identify Rule of Credit columns
     roc_cols = [col for col in edited_df.columns if col not in exclude_cols]
