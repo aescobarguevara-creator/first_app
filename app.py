@@ -148,6 +148,7 @@ df_filtered["Rule of credit"] = pd.Categorical(
     df_filtered["Rule of credit"],
     categories=roc_order,
     ordered=True
+)
 
 df_pivot = df_filtered.pivot_table(
     index=["Key","Widget"],
