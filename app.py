@@ -188,78 +188,77 @@ with st.form("progress_form"):
         column_config=column_config
     )
 
+    # ----------------------
+    # MASTER - DETAIL FORM
+    # ----------------------
+
+    widgets = df_filtered["Widget"].dropna().unique()
+
+    selected_widget = st.selectbox(
+        "Select Widget",
+        options = widgets,
+        index = None,
+        placeholder = 'Choose a widget...'
+    )
+
+    edit_mode = st.radio(
+        "Edit Mode",
+        ["View", "Edit"],
+        horizontal=True
+    )
+
+    is_editable = edit_mode == "Edit"
+
+    updated_rows = []
+
+    if selected_widget:
+
+        match = df_filtered[df_filtered["Widget"] == selected_widget]
+
+        if match.empty:
+            st.warning("No data found for this widget")
+            st.stop()
+
+        selected_key = match["Key"].iloc[0]
+
+        df_widget = df[df["Key"] == selected_key]
+
+        display_df = df_widget[["Rule of credit", "Date", "Comments"]]
+
+        st.markdown("### Details")
+
+        for i, row in display_df.iterrows():
+
+            st.markdown(f"**{row['Rule of credit']}**")
+
+            col1, col2 = st.columns([1, 2])
+
+            with col1:
+                new_date = st.date_input(
+                    f"Date_{i}",
+                    value=row["Date"] if pd.notna(row["Date"]) else None,
+                    disabled=not is_editable,
+                    key=f"date_{i}"
+                )
+
+            with col2:
+                new_comment = st.text_area(
+                    f"Comment_{i}",
+                    value=row["Comments"],
+                    disabled=not is_editable,
+                    key=f"comment_{i}"
+                )
+
+            updated_rows.append((row["Rule of credit"], new_date, new_comment))
+            
+    else:
+        # st.info("Please select a widget to view details.")
+        st.markdown(
+        "<span style='color:#2b2b2b;'>Please select a widget to view details.</span>",
+        unsafe_allow_html=True
+    )
+
     submitted = st.form_submit_button("Save Changes")
-
-# ----------------------
-# MASTER - DETAIL FORM
-# ----------------------
-
-widgets = df_filtered["Widget"].dropna().unique()
-
-selected_widget = st.selectbox(
-    "Select Widget",
-    options = widgets,
-    index = None,
-    placeholder = 'Choose a widget...'
-)
-
-edit_mode = st.radio(
-    "Edit Mode",
-    ["View", "Edit"],
-    horizontal=True
-)
-
-is_editable = edit_mode == "Edit"
-
-updated_rows = []
-
-if selected_widget:
-
-    match = df_filtered[df_filtered["Widget"] == selected_widget]
-
-    if match.empty:
-        st.warning("No data found for this widget")
-        st.stop()
-
-    selected_key = match["Key"].iloc[0]
-
-    df_widget = df[df["Key"] == selected_key]
-
-    display_df = df_widget[["Rule of credit", "Date", "Comments"]]
-
-    st.markdown("### Details")
-
-    for i, row in display_df.iterrows():
-
-        st.markdown(f"**{row['Rule of credit']}**")
-
-        col1, col2 = st.columns([1, 2])
-
-        with col1:
-            new_date = st.date_input(
-                f"Date_{i}",
-                value=row["Date"] if pd.notna(row["Date"]) else None,
-                disabled=not is_editable,
-                key=f"date_{i}"
-            )
-
-        with col2:
-            new_comment = st.text_area(
-                f"Comment_{i}",
-                value=row["Comments"],
-                disabled=not is_editable,
-                key=f"comment_{i}"
-            )
-
-        updated_rows.append((row["Rule of credit"], new_date, new_comment))
-        
-else:
-    # st.info("Please select a widget to view details.")
-    st.markdown(
-    "<span style='color:#2b2b2b;'>Please select a widget to view details.</span>",
-    unsafe_allow_html=True
-)
-
 
 
 # -----------------------------
@@ -323,7 +322,7 @@ if submitted:
                 (df_updated["Rule of credit"] == roc)
             )
 
-            # df_updated.loc[mask, "Date"] = date
+            df_updated.loc[mask, "Date"] = pd.to_datetime(date)
             df_updated.loc[mask, "Comments"] = comment
 
 
