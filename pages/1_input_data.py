@@ -9,7 +9,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 # PAGE CONFIG
 # -----------------------------
 st.set_page_config(
-    page_title="Progress Tracker",
+    page_title="Input Progress Data",
     layout="wide"
 )
 
