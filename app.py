@@ -128,10 +128,10 @@ area = col3.selectbox("Area", areas)
 
 df3 = df2[df2["Area"] == area]
 
-cost_codes = df3["Cost code"].dropna().unique()
+cost_codes = df3["LE - Cost code"].dropna().unique()
 cost_code = col4.selectbox("Cost Code", cost_codes)
 
-df4 = df3[df3["Cost code"] == cost_code]
+df4 = df3[df3["LE - Cost code"] == cost_code]
 
 # -----------------------------
 # TASK FILTER
