@@ -133,20 +133,10 @@ cost_code = col4.selectbox("Cost Code", cost_codes)
 
 df4 = df3[df3["LE - Cost code"] == cost_code]
 
-# -----------------------------
-# TASK FILTER
-# -----------------------------
-st.sidebar.markdown("### Tasks")
-
 tasks = df4["Task"].dropna().unique()
+task = st.selectbox("Task", tasks)
 
-selected_tasks = st.sidebar.multiselect(
-    "Select Tasks",
-    options=tasks,
-    default=list(tasks)
-)
-
-df_filtered = df4[df4["Task"].isin(selected_tasks)].copy()
+df_filtered = df4[df4["Task"] == task]
 
 # -----------------------------
 # PROGRESS TABLE
