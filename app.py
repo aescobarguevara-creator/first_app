@@ -1,10 +1,8 @@
 import streamlit as st
 import pandas as pd
 import time
-import os
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from datetime import datetime
 
 
 # -----------------------------
@@ -16,10 +14,11 @@ st.set_page_config(
 )
 
 # -----------------------------
-# CONNECTING TO GOOGHE SHEETS
+# CONNECT TO GOOGLE SHEETS
 # -----------------------------
 @st.cache_resource
 def init_connection():
+
     scope = [
         "https://spreadsheets.google.com/feeds",
         "https://www.googleapis.com/auth/drive"
@@ -28,39 +27,49 @@ def init_connection():
     creds_dict = dict(st.secrets["gcp_service_account"])
     creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
 
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(
+        creds_dict,
+        scope
+    )
 
     client = gspread.authorize(creds)
+
     return client
 
+
 client = init_connection()
+
+sheet = client.open("progress report - original").sheet1
 
 
 # -----------------------------
 # LOAD DATA
 # -----------------------------
-
-sheet = client.open("progress report - original").sheet1
-
 @st.cache_data
 def load_data():
 
     data = sheet.get_all_records()
+
     df = pd.DataFrame(data)
 
+    # Boolean cleanup
     df["Completed"] = (
         df["Completed"]
         .astype(str)
         .str.strip()
         .str.lower()
         .map({"true": True, "false": False})
-        .astype("boolean")   # optional
+        .fillna(False)
+        .astype(bool)
     )
 
+    # Comments
     df["Comments"] = df["Comments"].fillna("").astype(str)
+
+    # Dates
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 
-    # Create key
+    # Unique group key
     df["Key"] = (df["Widget"] != df["Widget"].shift()).cumsum()
 
     return df
@@ -80,7 +89,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------
-# HEADER + LOGO
+# HEADER
 # -----------------------------
 col_title, col_logo = st.columns([6, 1], vertical_alignment="center")
 
@@ -90,13 +99,15 @@ with col_title:
 with col_logo:
     st.image("logo.png", width=140)
 
-# 🔄 Refresh button (put here)
-if st.button("🔄 Refresh data"):
+# -----------------------------
+# REFRESH BUTTON
+# -----------------------------
+if st.button("🔄 Refresh Data"):
     st.cache_data.clear()
     st.rerun()
 
 # -----------------------------
-# TOP CASCADING FILTERS
+# FILTERS
 # -----------------------------
 st.markdown("### Filters")
 
@@ -123,7 +134,7 @@ cost_code = col4.selectbox("Cost Code", cost_codes)
 df4 = df3[df3["Cost code"] == cost_code]
 
 # -----------------------------
-# LEFT TASK LIST
+# TASK FILTER
 # -----------------------------
 st.sidebar.markdown("### Tasks")
 
@@ -135,12 +146,12 @@ selected_tasks = st.sidebar.multiselect(
     default=list(tasks)
 )
 
-df_filtered = df4[df4["Task"].isin(selected_tasks)]
-
+df_filtered = df4[df4["Task"].isin(selected_tasks)].copy()
 
 # -----------------------------
-# Pivoting table
+# PROGRESS TABLE
 # -----------------------------
+st.markdown("## Progress Tracking")
 
 roc_order = df_filtered["Rule of credit"].drop_duplicates().tolist()
 
@@ -151,153 +162,60 @@ df_filtered["Rule of credit"] = pd.Categorical(
 )
 
 df_pivot = df_filtered.pivot_table(
-    index=["Key","Widget"],
+    index=["Key", "Widget"],
     columns="Rule of credit",
     values="Completed",
-    aggfunc="sum",
-    fill_value = False
+    aggfunc="max",
+    fill_value=False
 ).reset_index()
 
-# flatten columns
 df_pivot.columns.name = None
 
-# Convert all Rule of Credit columns to bool
-exclude_cols = ["Widget", "Key"]  # add any key columns here
+exclude_cols = ["Key", "Widget"]
 
-roc_cols = [col for col in df_pivot.columns if col not in exclude_cols]
+roc_cols = [c for c in df_pivot.columns if c not in exclude_cols]
 
 df_pivot[roc_cols] = df_pivot[roc_cols].astype(bool)
-
-# -----------------------------
-# MAIN TABLE (NO IMAGES)
-# -----------------------------
-st.markdown("### Work Items")
 
 column_config = {
     col: st.column_config.CheckboxColumn(col)
     for col in roc_cols
 }
 
-
+# -----------------------------
+# FORM 1 - SAVE PROGRESS
+# -----------------------------
 with st.form("progress_form"):
 
     edited_df = st.data_editor(
         df_pivot,
         width="stretch",
-        num_rows="dynamic",
-        column_config=column_config
+        hide_index=True,
+        column_config=column_config,
+        num_rows="fixed"
     )
 
-    # ----------------------
-    # MASTER - DETAIL FORM
-    # ----------------------
-
-    widgets = df_filtered["Widget"].dropna().unique()
-
-    selected_widget = st.selectbox(
-        "Select Widget",
-        options = widgets,
-        index = None,
-        placeholder = 'Choose a widget...'
-    )
-
-    edit_mode = st.radio(
-        "Edit Mode",
-        ["View", "Edit"],
-        horizontal=True
-    )
-
-    is_editable = edit_mode == "Edit"
-
-    updated_rows = []
-
-    if selected_widget:
-
-        match = df_filtered[df_filtered["Widget"] == selected_widget]
-
-        if match.empty:
-            st.warning("No data found for this widget")
-            st.stop()
-
-        selected_key = match["Key"].iloc[0]
-
-        df_widget = df[df["Key"] == selected_key]
-
-        display_df = df_widget[["Rule of credit", "Date", "Comments"]]
-
-        st.markdown("### Details")
-
-        for i, row in display_df.iterrows():
-
-            st.markdown(f"**{row['Rule of credit']}**")
-
-            col1, col2 = st.columns([1, 2])
-
-            with col1:
-                new_date = st.date_input(
-                    f"Date_{i}",
-                    value=row["Date"] if pd.notna(row["Date"]) else None,
-                    disabled=not is_editable,
-                    key=f"date_{i}"
-                )
-
-            with col2:
-                new_comment = st.text_area(
-                    f"Comment_{i}",
-                    value=row["Comments"],
-                    disabled=not is_editable,
-                    key=f"comment_{i}"
-                )
-
-            updated_rows.append((row["Rule of credit"], new_date, new_comment))
-            
-    else:
-        # st.info("Please select a widget to view details.")
-        st.markdown(
-        "<span style='color:#2b2b2b;'>Please select a widget to view details.</span>",
-        unsafe_allow_html=True
-    )
-
-    submitted = st.form_submit_button("Save Changes")
-
+    save_progress = st.form_submit_button("Save Progress")
 
 # -----------------------------
-# SAVE CHANGES
+# SAVE PROGRESS LOGIC
 # -----------------------------
+if save_progress:
 
-if submitted:
+    df_updated = df.copy()
 
-    # Identify Rule of Credit columns
-    roc_cols = [col for col in edited_df.columns if col not in exclude_cols]
+    today = pd.Timestamp.today().normalize()
 
-    # -----------------------------
-    # 1. UNPIVOT (melt)
-    # -----------------------------
+    # Unpivot
     df_melted = edited_df.melt(
-        id_vars=["Key","Widget"],
+        id_vars=["Key", "Widget"],
         value_vars=roc_cols,
         var_name="Rule of credit",
         value_name="Completed"
     )
 
-    # Ensure boolean type
     df_melted["Completed"] = df_melted["Completed"].astype(bool)
 
-    # -----------------------------
-    # 2. MERGE BACK WITH ORIGINAL DATA
-    # -----------------------------
-    df_updated = df.copy()
-    today = pd.Timestamp.today().normalize()
-
-    for _, row in df_melted.iterrows():
-        mask = (
-            (df_updated["Key"] == row["Key"]) &
-            (df_updated["Rule of credit"] == row["Rule of credit"])
-        )
-
-        df_updated.loc[mask, "Completed"] = row["Completed"]
-
-
     for _, row in df_melted.iterrows():
 
         mask = (
@@ -305,46 +223,143 @@ if submitted:
             (df_updated["Rule of credit"] == row["Rule of credit"])
         )
 
-        old_value = df.loc[mask, "Completed"].values[0]
-        new_value = row["Completed"]
+        old_value = bool(df.loc[mask, "Completed"].iloc[0])
+        new_value = bool(row["Completed"])
 
-        # If checkbox was just checked → stamp date
-        if (old_value == False) and (new_value == True):
+        # Update completed
+        df_updated.loc[mask, "Completed"] = new_value
+
+        # Auto date logic
+        if (old_value is False) and (new_value is True):
             df_updated.loc[mask, "Date"] = today
 
-        elif (old_value == True) and (new_value == False):
+        elif (old_value is True) and (new_value is False):
             df_updated.loc[mask, "Date"] = pd.NaT
 
-    for roc, date, comment in updated_rows:
-
-            mask = (
-                (df_updated["Key"] == selected_key) &
-                (df_updated["Rule of credit"] == roc)
-            )
-
-            df_updated.loc[mask, "Date"] = pd.to_datetime(date)
-            df_updated.loc[mask, "Comments"] = comment
-
-
-    # -----------------------------
-    # 3. GOOGLE SHEET SAVE
-    # -----------------------------
-
+    # Format dates
+    df_updated["Date"] = pd.to_datetime(df_updated["Date"])
     df_updated["Date"] = df_updated["Date"].dt.strftime("%Y-%m-%d")
     df_updated["Date"] = df_updated["Date"].fillna("")
 
-    # sheet.clear()
-    sheet.update([df_updated.columns.values.tolist()] + df_updated.values.tolist())
+    # Push to sheet
+    sheet.update(
+        [df_updated.columns.values.tolist()] +
+        df_updated.values.tolist()
+    )
 
-    # st.success(f"Saved successfully to: {new_path}")
-    st.toast("Saved successfully!", icon="✅")
+    st.toast("Progress updated!", icon="✅")
 
-    # ⏳ Wait so user can see message
-    time.sleep(2)
+    time.sleep(1)
 
-    # 🔄 Force refresh
     st.cache_data.clear()
     st.rerun()
+
+# =========================================================
+# DETAIL EDITOR
+# =========================================================
+
+st.markdown("---")
+st.markdown("## Detail Editor")
+
+widgets = df_filtered["Widget"].dropna().unique()
+
+selected_widget = st.selectbox(
+    "Select Widget",
+    options=widgets,
+    index=None,
+    placeholder="Choose a widget..."
+)
+
+# -----------------------------
+# SHOW NOTHING IF NO SELECTION
+# -----------------------------
+if selected_widget:
+
+    match = df_filtered[df_filtered["Widget"] == selected_widget]
+
+    selected_key = match["Key"].iloc[0]
+
+    detail_df = df[
+        df["Key"] == selected_key
+    ][
+        ["Rule of credit", "Completed", "Date", "Comments"]
+    ].copy()
+
+    # -----------------------------
+    # FORM 2 - DETAIL EDITOR
+    # -----------------------------
+    with st.form("detail_form"):
+
+        edited_detail_df = st.data_editor(
+            detail_df,
+            width="stretch",
+            hide_index=True,
+            num_rows="fixed",
+            column_config={
+                "Completed": st.column_config.CheckboxColumn(
+                    "Completed"
+                ),
+                "Date": st.column_config.DateColumn(
+                    "Date",
+                    format="YYYY-MM-DD"
+                ),
+                "Comments": st.column_config.TextColumn(
+                    "Comments"
+                )
+            }
+        )
+
+        save_details = st.form_submit_button("Save Details")
+
+    # -----------------------------
+    # SAVE DETAIL LOGIC
+    # -----------------------------
+    if save_details:
+
+        df_updated = df.copy()
+
+        for _, row in edited_detail_df.iterrows():
+
+            mask = (
+                (df_updated["Key"] == selected_key) &
+                (
+                    df_updated["Rule of credit"]
+                    == row["Rule of credit"]
+                )
+            )
+
+            new_completed = bool(row["Completed"])
+            new_date = pd.to_datetime(row["Date"], errors="coerce")
+            new_comment = str(row["Comments"])
+
+            # Business rule enforcement
+            if pd.notna(new_date):
+                new_completed = True
+
+            if new_completed is False:
+                new_date = pd.NaT
+
+            df_updated.loc[mask, "Completed"] = new_completed
+            df_updated.loc[mask, "Date"] = new_date
+            df_updated.loc[mask, "Comments"] = new_comment
+
+        # Format dates
+        df_updated["Date"] = pd.to_datetime(df_updated["Date"])
+        df_updated["Date"] = df_updated["Date"].dt.strftime("%Y-%m-%d")
+        df_updated["Date"] = df_updated["Date"].fillna("")
+
+        # Push to Google Sheets
+        sheet.update(
+            [df_updated.columns.values.tolist()] +
+            df_updated.values.tolist()
+        )
+
+        st.toast("Details updated!", icon="✅")
+
+        time.sleep(1)
+
+        st.cache_data.clear()
+        st.rerun()
 
 # Run local
 # py -m streamlit run progress_v6.py
