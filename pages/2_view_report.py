@@ -139,8 +139,153 @@ task = st.selectbox("Task", tasks)
 df_filtered = df4[df4["Task"] == task]
 
 # -----------------------------
-# PROGRESS TABLE
+# BURNDOWN CURVE
 # -----------------------------
+
+st.markdown("### Burndown Curve")
+
+# Keep only completed items with valid dates
+df_burn = df_filtered[
+    (df_filtered["Completed"] == True) &
+    (df_filtered["Date"].notna())
+].copy()
+
+if df_filtered.empty:
+
+    st.warning("No data available for selected filters.")
+
+else:
+
+    # -----------------------------
+    # Calendar range
+    # -----------------------------
+    start_date = df_filtered["Date"].min()
+    end_date = df_filtered["Date"].max()
+
+    # Fallback if no dates exist yet
+    if pd.isna(start_date) or pd.isna(end_date):
+
+        st.warning("No dates available yet.")
+
+    else:
+
+        # -----------------------------
+        # Calendar table
+        # -----------------------------
+        calendar_df = pd.DataFrame({
+            "Date": pd.date_range(
+                start=start_date,
+                end=end_date,
+                freq="D"
+            )
+        })
+
+        # -----------------------------
+        # Rule of credit list
+        # -----------------------------
+        roc_list = (
+            df_filtered["Rule of credit"]
+            .dropna()
+            .unique()
+        )
+
+        # -----------------------------
+        # Create binary daily columns
+        # -----------------------------
+        for roc in roc_list:
+
+            # Daily counts
+            counts = (
+                df_burn[
+                    df_burn["Rule of credit"] == roc
+                ]
+                .groupby("Date")
+                .size()
+                .reset_index(name=roc)
+            )
+
+            # Merge into calendar
+            calendar_df = calendar_df.merge(
+                counts,
+                on="Date",
+                how="left"
+            )
+
+            # Fill missing days
+            calendar_df[roc] = (
+                calendar_df[roc]
+                .fillna(0)
+                .astype(int)
+            )
+
+        # -----------------------------
+        # Accumulated progress
+        # -----------------------------
+        for roc in roc_list:
+
+            calendar_df[f"{roc}_acc"] = (
+                calendar_df[roc]
+                .cumsum()
+            )
+
+        # -----------------------------
+        # Remaining quantities
+        # -----------------------------
+        for roc in roc_list:
+
+            # Total planned scope
+            total = (
+                df_filtered[
+                    df_filtered["Rule of credit"] == roc
+                ]
+                .shape[0]
+            )
+
+            # Remaining work
+            calendar_df[f"{roc}_remaining"] = (
+                total -
+                calendar_df[f"{roc}_acc"]
+            )
+
+        # -----------------------------
+        # Chart dataframe
+        # -----------------------------
+        remaining_cols = [
+            f"{roc}_remaining"
+            for roc in roc_list
+        ]
+
+        chart_df = calendar_df[
+            ["Date"] + remaining_cols
+        ].copy()
+
+        # Clean names
+        rename_dict = {
+            f"{roc}_remaining": roc
+            for roc in roc_list
+        }
+
+        chart_df = chart_df.rename(
+            columns=rename_dict
+        )
+
+        # -----------------------------
+        # Area chart
+        # -----------------------------
+        st.area_chart(
+            chart_df,
+            x="Date"
+        )
+
+        # -----------------------------
+        # Optional table
+        # -----------------------------
+        with st.expander("View Burndown Data"):
+
+            st.dataframe(
+                chart_df,
+                width="stretch"
+            )
 
 
 
