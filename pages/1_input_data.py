@@ -105,6 +105,7 @@ with col_logo:
 if st.button("🔄 Refresh Data"):
     load_data.clear()
     st.cache_data.clear()
+    st.cache_resource.clear()
     st.rerun()
 
 # -----------------------------
