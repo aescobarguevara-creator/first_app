@@ -103,7 +103,7 @@ with col_logo:
 # REFRESH BUTTON
 # -----------------------------
 if st.button("🔄 Refresh Data"):
-    st.load_data.clear()
+    load_data.clear()
     st.cache_data.clear()
     st.rerun()
 
