@@ -144,6 +144,13 @@ df_filtered = df4[df4["Task"] == task]
 
 st.markdown("### Burndown Curve")
 
+# Preserve original ROC order
+roc_order = (
+    df_filtered["Rule of credit"]
+    .drop_duplicates()
+    .tolist()
+)
+
 # Keep only completed items with valid dates
 df_burn = df_filtered[
     (df_filtered["Completed"] == True) &
@@ -183,11 +190,7 @@ else:
         # -----------------------------
         # Rule of credit list
         # -----------------------------
-        roc_list = (
-            df_filtered["Rule of credit"]
-            .dropna()
-            .unique()
-        )
+        roc_list = roc_order[::-1]
 
         # -----------------------------
         # Create binary daily columns
