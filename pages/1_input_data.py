@@ -1,3 +1,5 @@
+from xmlrpc import client
+
 import streamlit as st
 import pandas as pd
 import time
@@ -37,16 +39,15 @@ def init_connection():
     return client
 
 
-client = init_connection()
-
-sheet = client.open("progress report - original").sheet1
-
-
 # -----------------------------
 # LOAD DATA
 # -----------------------------
 @st.cache_data
 def load_data():
+
+    client = init_connection()
+
+    sheet = client.open("progress report - original").sheet1
 
     data = sheet.get_all_records()
 
