@@ -136,7 +136,28 @@ df4 = df3[df3["LE - Cost code"] == cost_code]
 tasks = df4["Task"].dropna().unique()
 task = st.selectbox("Task", tasks)
 
-df_filtered = df4[df4["Task"] == task]
+df5 = df4[df4["Task"] == task]
+
+
+min_date = df["Date"].min()
+max_date = df["Date"].max()
+
+date_range = st.slider(
+    "Timeline",
+    min_value=min_date.to_pydatetime(),
+    max_value=max_date.to_pydatetime(),
+    value=(
+        min_date.to_pydatetime(),
+        max_date.to_pydatetime()
+    )
+)
+
+start_filter, end_filter = date_range
+
+df_filtered = df5[
+    (df5["Date"] >= pd.to_datetime(start_filter)) &
+    (df5["Date"] <= pd.to_datetime(end_filter))
+]
 
 # -----------------------------
 # BURNDOWN CURVE
