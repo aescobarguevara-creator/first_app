@@ -312,6 +312,58 @@ else:
             )
 
 
+            # -----------------------------
+            # Define final roc
+            # -----------------------------
+
+            final_roc = roc_order[-1]
+            df_final = df_filtered[
+                df_filtered["Rule of credit"] == final_roc
+            ]
+
+
+
+            #-----------------------------
+            # Calculate metrics
+            #-----------------------------
+
+
+            total_widgets = df_final["Widget"].nunique()
+
+            completed_widgets = (
+                df_final[df_final["Completed"] == True]["Widget"]
+                .nunique()
+            )
+
+            remaining_widgets = total_widgets - completed_widgets
+
+            progress_percent = (
+                completed_widgets / total_widgets * 100
+                if total_widgets > 0 else 0
+            )
+
+            #-----------------------------
+            # Display metrics
+            #-----------------------------
+
+            col1, col2, col3 = st.columns(3)
+
+            col1.metric(
+                label="Total Widgets",
+                value=total_widgets
+            )
+
+            col2.metric(
+                label="Completed Widgets",
+                value=completed_widgets
+            )
+
+            col3.metric(
+                label="Progress",
+                value=f"{progress_percent:.1f}%"
+            )
+
+
 
 # Run local
 # py -m streamlit run progress_v6.py
