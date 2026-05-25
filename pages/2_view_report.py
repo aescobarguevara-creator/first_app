@@ -301,17 +301,6 @@ else:
             x="Date"
         )
 
-        # -----------------------------
-        # Optional table
-        # -----------------------------
-        with st.expander("View Burndown Data"):
-
-            st.dataframe(
-                chart_df,
-                width="stretch"
-            )
-
-
             # -----------------------------
             # Define final roc
             # -----------------------------
@@ -326,7 +315,6 @@ else:
             #-----------------------------
             # Calculate metrics
             #-----------------------------
-
 
             total_widgets = df_final["Widget"].nunique()
 
@@ -363,6 +351,16 @@ else:
                 value=f"{progress_percent:.1f}%"
             )
 
+
+        # -----------------------------
+        # Optional table
+        # -----------------------------
+        with st.expander("View Burndown Data"):
+
+            st.dataframe(
+                chart_df,
+                width="stretch"
+            )
 
 
 # Run local
