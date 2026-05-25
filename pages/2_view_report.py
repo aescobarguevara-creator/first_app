@@ -3,6 +3,7 @@ import pandas as pd
 import time
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import plotly.express as px
 
 
 # -----------------------------
@@ -295,14 +296,26 @@ else:
         # Area chart
         # -----------------------------
 
+        y_max = chart_df.drop(columns="Date").max().max()
+
         chart_df_plot = chart_df[
             (chart_df["Date"] >= pd.to_datetime(start_filter)) &
             (chart_df["Date"] <= pd.to_datetime(end_filter))
             ]
 
-        st.area_chart(
+        fig = px.area(
             chart_df_plot,
-            x="Date"
+            x="Date",
+            y=chart_df_plot.columns[1:]
+        )
+
+        fig.update_yaxes(
+            range=[0, y_max]
+        )
+
+        st.plotly_chart(
+            fig,
+            width="stretch"
         )
 
         # -----------------------------
