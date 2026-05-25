@@ -319,8 +319,7 @@ else:
         total_widgets = df_final["Widget"].nunique()
 
         completed_widgets = (
-            df_final[df_final["Completed"] == True]["Widget"]
-            .nunique()
+            df_final["Widget"].nunique()
         )
 
         remaining_widgets = total_widgets - completed_widgets
