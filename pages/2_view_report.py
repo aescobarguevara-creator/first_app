@@ -302,11 +302,15 @@ else:
             (chart_df["Date"] >= pd.to_datetime(start_filter)) &
             (chart_df["Date"] <= pd.to_datetime(end_filter))
             ]
+        
+        plot_cols = ["Date"] + list(chart_df_plot.columns[1:][::-1])
+
+        chart_df_plot_reordered = chart_df_plot[plot_cols]
 
         fig = px.area(
             chart_df_plot,
             x="Date",
-            y=chart_df_plot.columns[1:][::-1]
+            y=chart_df_plot.columns[1:]
         )
 
         fig.update_yaxes(
