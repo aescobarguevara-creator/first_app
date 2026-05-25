@@ -136,8 +136,11 @@ df4 = df3[df3["LE - Cost code"] == cost_code]
 tasks = df4["Task"].dropna().unique()
 task = st.selectbox("Task", tasks)
 
-df5 = df4[df4["Task"] == task]
+df_filtered = df4[df4["Task"] == task]
 
+#------------------------------
+# Date range filter
+#------------------------------
 
 min_date = df["Date"].min()
 max_date = df["Date"].max()
@@ -153,11 +156,6 @@ date_range = st.slider(
 )
 
 start_filter, end_filter = date_range
-
-df_filtered = df5[
-    (df5["Date"] >= pd.to_datetime(start_filter)) &
-    (df5["Date"] <= pd.to_datetime(end_filter))
-]
 
 # -----------------------------
 # BURNDOWN CURVE
@@ -296,8 +294,14 @@ else:
         # -----------------------------
         # Area chart
         # -----------------------------
+
+        chart_df_plot = chart_df[
+            (chart_df["Date"] >= pd.to_datetime(start_filter)) &
+            (chart_df["Date"] <= pd.to_datetime(end_filter))
+            ]
+
         st.area_chart(
-            chart_df,
+            chart_df_plot,
             x="Date"
         )
 
@@ -309,8 +313,6 @@ else:
         df_final = df_filtered[
             df_filtered["Rule of credit"] == final_roc
         ]
-
-
 
         #-----------------------------
         # Calculate metrics
