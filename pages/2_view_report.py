@@ -310,7 +310,7 @@ else:
         fig = px.area(
             chart_df_plot_reordered,
             x="Date",
-            y=chart_df_plot.columns[1:]
+            y=chart_df_plot_reordered.columns[1:]
         )
 
         fig.update_yaxes(
