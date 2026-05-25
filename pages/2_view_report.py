@@ -308,7 +308,7 @@ else:
         chart_df_plot_reordered = chart_df_plot[plot_cols]
 
         fig = px.area(
-            chart_df_plot,
+            chart_df_plot_reordered,
             x="Date",
             y=chart_df_plot.columns[1:]
         )
