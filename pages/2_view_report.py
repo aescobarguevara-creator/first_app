@@ -309,7 +309,7 @@ else:
 
         fig = go.Figure()
 
-        for roc in roc_list[::-1]:
+        for roc in roc_list:
 
             fig.add_trace(
                 go.Scatter(
