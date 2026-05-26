@@ -189,8 +189,7 @@ else:
 
     today = pd.Timestamp.today().normalize()
     start_date = df_filtered["Date"].min()
-    # end_date = df_filtered["Date"].max()
-    end_date = today
+    end_date = df_filtered["Date"].max()
 
     # Fallback if no dates exist yet
     if pd.isna(start_date) or pd.isna(end_date):
@@ -360,14 +359,18 @@ else:
             if total_widgets > 0 else 0
         )
 
+        total_days = (end_date - start_date).days + 1
 
-
-
+        production_to_date = (
+            completed_widgets / (total_days / 7)
+            if total_days > 0 else 0
+        )
 
         #-----------------------------
         # Display metrics
         #-----------------------------
 
+        # first row
         col1, col2, col3 = st.columns(3)
 
         col1.metric(
@@ -381,18 +384,39 @@ else:
         )
 
         col3.metric(
+            label="Remaining Widgets",
+            value=remaining_widgets
+        )
+
+
+        # Second row
+        col4, col5, col6 = st.columns(3)
+
+        col4.metric(
             label="Progress",
             value=f"{progress_percent:.1f}%"
         )
 
-        fig = go.Figure(go.Indicator(
-            mode="gauge+number",
-            value=progress_percent,
-            title={'text': "Percent Complete"},
-            gauge={'axis': {'range': [0, 100]}}
-        ))
+        col5.metric(
+            label="To-Date Production",
+            value=f"{production_to_date:.1f} widgets/week"
+        )
 
-        st.plotly_chart(fig, width="stretch")
+        # col6.metric(
+        #     label="Last Week Speed",
+        #     value=f"{speed_last_week} widgets/week"
+        # )
+
+
+
+        # fig = go.Figure(go.Indicator(
+        #     mode="gauge+number",
+        #     value=progress_percent,
+        #     title={'text': "Percent Complete"},
+        #     gauge={'axis': {'range': [0, 100]}}
+        # ))
+
+        # st.plotly_chart(fig, width="stretch")
 
 
         # -----------------------------
