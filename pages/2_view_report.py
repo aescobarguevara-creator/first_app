@@ -186,8 +186,11 @@ else:
     # -----------------------------
     # Calendar range
     # -----------------------------
+
+    today = pd.Timestamp.today().normalize()
     start_date = df_filtered["Date"].min()
-    end_date = df_filtered["Date"].max()
+    # end_date = df_filtered["Date"].max()
+    end_date = today
 
     # Fallback if no dates exist yet
     if pd.isna(start_date) or pd.isna(end_date):
