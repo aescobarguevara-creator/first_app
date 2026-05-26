@@ -3,7 +3,7 @@ import pandas as pd
 import time
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-import plotly.express as px
+import plotly.graph_objects as go
 
 
 # -----------------------------
@@ -307,11 +307,19 @@ else:
 
         chart_df_plot_reordered = chart_df_plot[plot_cols]
 
-        fig = px.area(
-            chart_df_plot_reordered,
-            x="Date",
-            y=chart_df_plot_reordered.columns[1:]
-        )
+        fig = go.Figure()
+
+        for roc in roc_list[::-1]:
+
+            fig.add_trace(
+                go.Scatter(
+                    x=chart_df_plot["Date"],
+                    y=chart_df_plot[roc],
+                    mode="lines",
+                    name=roc,
+                    fill="tozeroy"
+                )
+            )
 
         fig.update_yaxes(
             range=[0, y_max]
