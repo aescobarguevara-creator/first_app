@@ -139,6 +139,12 @@ task = st.selectbox("Task", tasks)
 
 df_filtered = df4[df4["Task"] == task]
 
+#------------------------------
+# Date range for slider
+#------------------------------
+min_date = df["Date"].min()
+max_date = df["Date"].max()
+
 
 # -----------------------------
 # BURNDOWN CURVE
@@ -317,9 +323,6 @@ else:
         #------------------------------
         # Date range filter
         #------------------------------
-
-        min_date = df["Date"].min()
-        max_date = df["Date"].max()
 
         date_range = st.slider(
             "Timeline",
