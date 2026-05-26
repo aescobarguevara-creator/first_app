@@ -139,24 +139,6 @@ task = st.selectbox("Task", tasks)
 
 df_filtered = df4[df4["Task"] == task]
 
-#------------------------------
-# Date range filter
-#------------------------------
-
-min_date = df["Date"].min()
-max_date = df["Date"].max()
-
-date_range = st.slider(
-    "Timeline",
-    min_value=min_date.to_pydatetime(),
-    max_value=max_date.to_pydatetime(),
-    value=(
-        min_date.to_pydatetime(),
-        max_date.to_pydatetime()
-    )
-)
-
-start_filter, end_filter = date_range
 
 # -----------------------------
 # BURNDOWN CURVE
@@ -331,6 +313,27 @@ else:
             fig,
             width="stretch"
         )
+
+        #------------------------------
+        # Date range filter
+        #------------------------------
+
+        min_date = df["Date"].min()
+        max_date = df["Date"].max()
+
+        date_range = st.slider(
+            "Timeline",
+            min_value=min_date.to_pydatetime(),
+            max_value=max_date.to_pydatetime(),
+            value=(
+                min_date.to_pydatetime(),
+                max_date.to_pydatetime()
+            )
+        )
+
+        start_filter, end_filter = date_range
+
+
 
         # -----------------------------
         # Define final roc
