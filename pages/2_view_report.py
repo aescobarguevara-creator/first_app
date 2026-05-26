@@ -360,6 +360,10 @@ else:
             if total_widgets > 0 else 0
         )
 
+
+
+
+
         #-----------------------------
         # Display metrics
         #-----------------------------
@@ -380,6 +384,15 @@ else:
             label="Progress",
             value=f"{progress_percent:.1f}%"
         )
+
+        fig = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=progress_percent,
+            title={'text': "Percent Complete"},
+            gauge={'axis': {'range': [0, 100]}}
+        ))
+
+        st.plotly_chart(fig, width="stretch")
 
 
         # -----------------------------
