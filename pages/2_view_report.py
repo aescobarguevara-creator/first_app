@@ -146,7 +146,7 @@ cost_code = col5.multiselect(
     placeholder = 'Multiple Selection allowed'
 )
 
-df_filtered = df5[df5["Rule of credit"].isin(cost_code)]
+df_filtered = df5[df5["LE - Cost code"].isin(cost_code)]
 
 #------------------------------
 # Date range filter
