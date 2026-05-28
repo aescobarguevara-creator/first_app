@@ -98,7 +98,7 @@ with col_title:
     st.title("QUANTITY PROGRESS TRACKER")
 
 with col_logo:
-    st.image("logo.png", width=140)
+    st.image("logo_ferrovial.jpg", width=140)
 
 # -----------------------------
 # REFRESH BUTTON
