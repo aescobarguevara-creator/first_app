@@ -141,10 +141,15 @@ task = col5.selectbox("Task", tasks)
 
 df5 = df4[df4["Task"] == task]
 
-rule_credit = df5["Rule of credit"].dropna().unique()
-rule_credit = col6.selectbox("Rule of Credit", rule_credit)
+rule_credit_options = df5["Rule of credit"].dropna().unique()
 
-df_filtered = df5[df5["Rule of credit"] == rule_credit]
+rule_credit = col6.multiselect(
+    "Rule of Credit",
+    options=rule_credit_options,
+    default=rule_credit_options
+)
+
+df_filtered = df5[df5["Rule of credit"].isin(rule_credit)]
 
 #------------------------------
 # Date range filter
