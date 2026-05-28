@@ -340,6 +340,16 @@ else:
             range=[0, y_max]
         )
 
+        fig.update_layout(
+            legend=dict(
+                orientation="h",
+                x=0.5,
+                xanchor="center",
+                y=-0.3,
+                yanchor="bottom"
+            )
+        )
+
         st.plotly_chart(
             fig,
             width="stretch"
