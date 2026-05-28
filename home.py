@@ -28,7 +28,7 @@ with col1:
     st.title("QUANTITY PROGRESS TRACKER")
 
 with col2:
-    st.image("logo.png", width=140)
+    st.image("logo_ferrovial.jpg", width=140)
 
 # -----------------------------
 # HOME PAGE
