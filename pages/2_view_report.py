@@ -137,7 +137,12 @@ df4 = df3[df3["LE - Cost code"] == cost_code]
 tasks = df4["Task"].dropna().unique()
 task = st.selectbox("Task", tasks)
 
-df_filtered = df4[df4["Task"] == task]
+df5 = df4[df4["Task"] == task]
+
+rule_credit = df5["Rule of credit"].dropna().unique()
+rule_credit = st.selectbox("Rule of Credit", rule_credit)
+
+df_filtered = df5[df5["Rule of credit"] == rule_credit]
 
 #------------------------------
 # Date range filter
@@ -366,6 +371,8 @@ else:
             if total_days > 0 else 0
         )
 
+        st.markdown("### Progress metrics")
+
         #-----------------------------
         # Display metrics
         #-----------------------------
@@ -408,17 +415,6 @@ else:
         # )
 
 
-
-        # fig = go.Figure(go.Indicator(
-        #     mode="gauge+number",
-        #     value=progress_percent,
-        #     title={'text': "Percent Complete"},
-        #     gauge={'axis': {'range': [0, 100]}}
-        # ))
-
-        # st.plotly_chart(fig, width="stretch")
-
-
         # -----------------------------
         # Optional table
         # -----------------------------
@@ -429,6 +425,8 @@ else:
                 width="stretch"
             )
 
+
+        st.markdown("### Material usage")
 
 # Run local
 # py -m streamlit run progress_v6.py
