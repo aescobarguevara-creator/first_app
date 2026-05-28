@@ -134,13 +134,15 @@ cost_code = col4.selectbox("Cost Code", cost_codes)
 
 df4 = df3[df3["LE - Cost code"] == cost_code]
 
+col5, col6, col7, col8 = st.columns(4)
+
 tasks = df4["Task"].dropna().unique()
-task = st.selectbox("Task", tasks)
+task = col5.selectbox("Task", tasks)
 
 df5 = df4[df4["Task"] == task]
 
 rule_credit = df5["Rule of credit"].dropna().unique()
-rule_credit = st.selectbox("Rule of Credit", rule_credit)
+rule_credit = col6.selectbox("Rule of Credit", rule_credit)
 
 df_filtered = df5[df5["Rule of credit"] == rule_credit]
 
