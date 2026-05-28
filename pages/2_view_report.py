@@ -143,12 +143,13 @@ df5 = df4[df4["Task"] == task]
 
 rule_credit_options = df5["Rule of credit"].dropna().unique()
 
-rule_credit = col6.multiselect(
-    "Rule of Credit",
-    options=rule_credit_options,
-    default=rule_credit_options,
-    placeholder = 'Multiple Selected'
-)
+with col6.expander("Rule of Credit"):
+    rule_credit = st.multiselect(
+        "Select values",
+        options=rule_credit_options,
+        default=rule_credit_options,
+        label_visibility="collapsed"
+    )
 
 df_filtered = df5[df5["Rule of credit"].isin(rule_credit)]
 
