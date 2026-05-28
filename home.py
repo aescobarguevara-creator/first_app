@@ -44,6 +44,11 @@ Use the sidebar to navigate between:
 - **View Report** → dashboards, charts, and metrics
 """)
 
+st.image(
+    "trestle.jfif",
+    use_container_width=True
+)
+
 # Run local
 # py -m streamlit run progress_v6.py
 
