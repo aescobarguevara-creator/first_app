@@ -132,12 +132,12 @@ df3 = df2[df2["Area"] == area]
 tasks = df3["Task"].dropna().unique()
 task = col4.selectbox("Task", tasks)
 
-df5 = df3[df3["Task"] == task]
+df4 = df3[df3["Task"] == task]
 
 col5, col6, col7, col8 = st.columns(4)
 
 
-cost_codes_options = df5["LE - Cost code"].dropna().unique()
+cost_codes_options = df4["LE - Cost code"].dropna().unique()
 
 cost_code = col5.multiselect(
     "LE Cost Code",
@@ -146,7 +146,7 @@ cost_code = col5.multiselect(
     placeholder = 'Multiple Selection allowed'
 )
 
-df_filtered = df5[df5["LE - Cost code"].isin(cost_code)]
+df_filtered = df4[df4["LE - Cost code"].isin(cost_code)]
 
 #------------------------------
 # Date range filter

@@ -131,15 +131,23 @@ area = col3.selectbox("Area", areas)
 
 df3 = df2[df2["Area"] == area]
 
-cost_codes = df3["LE - Cost code"].dropna().unique()
-cost_code = col4.selectbox("Cost Code", cost_codes)
-
-df4 = df3[df3["LE - Cost code"] == cost_code]
-
-tasks = df4["Task"].dropna().unique()
+tasks = df3["Task"].dropna().unique()
 task = st.selectbox("Task", tasks)
 
-df_filtered = df4[df4["Task"] == task]
+df4 = df3[df3["Task"] == task]
+
+col5, col6, col7, col8 = st.columns(4)
+
+cost_codes_options = df4["LE - Cost code"].dropna().unique()
+
+cost_code = col5.multiselect(
+    "LE Cost Code",
+    options=cost_codes_options,
+    default=cost_codes_options,
+    placeholder = 'Multiple Selection allowed'
+)
+
+df_filtered = df4[df4["LE - Cost code"].isin(cost_code)]
 
 # -----------------------------
 # PROGRESS TABLE
