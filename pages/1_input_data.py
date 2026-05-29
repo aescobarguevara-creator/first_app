@@ -132,7 +132,7 @@ area = col3.selectbox("Area", areas)
 df3 = df2[df2["Area"] == area]
 
 tasks = df3["Task"].dropna().unique()
-task = st.selectbox("Task", tasks)
+task = col4.selectbox("Task", tasks)
 
 df4 = df3[df3["Task"] == task]
 
