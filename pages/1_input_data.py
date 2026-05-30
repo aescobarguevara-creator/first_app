@@ -224,12 +224,7 @@ if save_progress:
             (df_updated["Rule of credit"] == row["Rule of credit"])
         )
 
-        # Verifying that the mask is correct and returns expected results
-
-        filtered = df.loc[mask, "Completed"]
-
-        st.write("Rows found:", len(filtered))
-        st.write(filtered)
+        st.write(mask.sum())
 
         old_value = bool(df.loc[mask, "Completed"].iloc[0])
         new_value = bool(row["Completed"])
