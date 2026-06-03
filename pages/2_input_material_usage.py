@@ -45,7 +45,7 @@ def init_connection():
 
 client = init_connection()
 
-sheet = client.open("progress report - original").material
+sheet = client.open("progress report - original").worksheet("material")
 
 @st.cache_data
 def load_data():
