@@ -163,7 +163,7 @@ df_filtered["Rule of credit"] = pd.Categorical(
 )
 
 df_pivot = df_filtered.pivot_table(
-    index=["Key", "Widget"],
+    index=["Key", "Work Unit"],
     columns="Rule of credit",
     values="Completed",
     aggfunc="max",
@@ -172,7 +172,7 @@ df_pivot = df_filtered.pivot_table(
 
 df_pivot.columns.name = None
 
-exclude_cols = ["Key", "Widget"]
+exclude_cols = ["Key", "Work Unit"]
 
 roc_cols = [c for c in df_pivot.columns if c not in exclude_cols]
 
@@ -209,7 +209,7 @@ if save_progress:
 
     # Unpivot
     df_melted = edited_df.melt(
-        id_vars=["Key", "Widget"],
+        id_vars=["Key", "Work Unit"],
         value_vars=roc_cols,
         var_name="Rule of credit",
         value_name="Completed"
@@ -264,21 +264,21 @@ if save_progress:
 st.markdown("---")
 st.markdown("## Detail Editor")
 
-widgets = df_filtered["Widget"].dropna().unique()
+work_units = df_filtered["Work Unit"].dropna().unique()
 
-selected_widget = st.selectbox(
-    "Select Widget",
-    options=widgets,
+selected_work_unit = st.selectbox(
+    "Select Work Unit",
+    options=work_units,
     index=None,
-    placeholder="Choose a widget..."
+    placeholder="Choose a work unit..."
 )
 
 # -----------------------------
 # SHOW NOTHING IF NO SELECTION
 # -----------------------------
-if selected_widget:
+if selected_work_unit:
 
-    match = df_filtered[df_filtered["Widget"] == selected_widget]
+    match = df_filtered[df_filtered["Work Unit"] == selected_work_unit]
 
     selected_key = match["Key"].iloc[0]
 

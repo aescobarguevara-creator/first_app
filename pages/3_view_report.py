@@ -71,7 +71,7 @@ def load_data():
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 
     # Unique group key
-    df["Key"] = (df["Widget"] != df["Widget"].shift()).cumsum()
+    df["Key"] = (df["Work Unit"] != df["Work Unit"].shift()).cumsum()
 
     return df
 
@@ -364,10 +364,10 @@ else:
         # Calculate metrics
         #-----------------------------
 
-        total_widgets = df_final["Widget"].nunique()
+        total_widgets = df_final["Work Unit"].nunique()
 
         completed_widgets = (
-            df_final[df_final["Completed"] == True]["Widget"]
+            df_final[df_final["Completed"] == True]["Work Unit"]
             .nunique()
         )
 
@@ -395,17 +395,17 @@ else:
         col1, col2, col3 = st.columns(3)
 
         col1.metric(
-            label="Total Widgets",
+            label="Total Work Units",
             value=total_widgets
         )
 
         col2.metric(
-            label="Completed Widgets",
+            label="Completed Work Units",
             value=completed_widgets
         )
 
         col3.metric(
-            label="Remaining Widgets",
+            label="Remaining Work Units",
             value=remaining_widgets
         )
 
@@ -420,12 +420,12 @@ else:
 
         col5.metric(
             label="To-Date Production",
-            value=f"{production_to_date:.1f} widgets/week"
+            value=f"{production_to_date:.1f} work units/week"
         )
 
         # col6.metric(
         #     label="Last Week Speed",
-        #     value=f"{speed_last_week} widgets/week"
+        #     value=f"{speed_last_week} work units/week"
         # )
 
 
