@@ -147,25 +147,25 @@ cost_code = col5.multiselect(
     placeholder = 'Multiple Selection allowed'
 )
 
-df_filtered = df4[df4["LE - Cost code"].isin(cost_code)]
+df_filtered = df4[df4["M - Cost code"].isin(cost_code)]
 
 # -----------------------------
-# PROGRESS TABLE
+# MATERIAL USAGE TABLE
 # -----------------------------
-st.markdown("## Progress Tracking")
+st.markdown("## Material Usage Tracking")
 
-roc_order = df_filtered["Rule of credit"].drop_duplicates().tolist()
+material_order = df_filtered["material"].drop_duplicates().tolist()
 
-df_filtered["Rule of credit"] = pd.Categorical(
-    df_filtered["Rule of credit"],
-    categories=roc_order,
+df_filtered["material"] = pd.Categorical(
+    df_filtered["material"],
+    categories=material_order,
     ordered=True
 )
 
 df_pivot = df_filtered.pivot_table(
     index=["Key", "Work Unit"],
-    columns="Rule of credit",
-    values="Completed",
+    columns="material",
+    values="estimated quantity",
     aggfunc="max",
     fill_value=False
 ).reset_index()
@@ -174,13 +174,13 @@ df_pivot.columns.name = None
 
 exclude_cols = ["Key", "Work Unit"]
 
-roc_cols = [c for c in df_pivot.columns if c not in exclude_cols]
+material_cols = [c for c in df_pivot.columns if c not in exclude_cols]
 
-df_pivot[roc_cols] = df_pivot[roc_cols].astype(bool)
+df_pivot[material_cols] = df_pivot[material_cols].astype(float)
 
 column_config = {
-    col: st.column_config.CheckboxColumn(col)
-    for col in roc_cols
+    col: st.column_config.NumberColumn(col)
+    for col in material_cols
 }
 
 # -----------------------------
@@ -196,7 +196,7 @@ with st.form("progress_form"):
         num_rows="fixed"
     )
 
-    save_progress = st.form_submit_button("Save Progress")
+    save_progress = st.form_submit_button("Save Material Quantities")
 
 # -----------------------------
 # SAVE PROGRESS LOGIC
@@ -210,34 +210,34 @@ if save_progress:
     # Unpivot
     df_melted = edited_df.melt(
         id_vars=["Key", "Work Unit"],
-        value_vars=roc_cols,
-        var_name="Rule of credit",
-        value_name="Completed"
+        value_vars=material_cols,
+        var_name="material",
+        value_name="estimated quantity"
     )
 
-    df_melted["Completed"] = df_melted["Completed"].astype(bool)
+    df_melted["estimated quantity"] = df_melted["estimated quantity"].astype(float)
 
     for _, row in df_melted.iterrows():
 
         mask = (
             (df_updated["Key"] == row["Key"]) &
-            (df_updated["Rule of credit"] == row["Rule of credit"])
+            (df_updated["material"] == row["material"])
         )
 
         st.write(mask.sum())
 
-        old_value = bool(df.loc[mask, "Completed"].iloc[0])
-        new_value = bool(row["Completed"])
+        old_value = float(df.loc[mask, "estimated quantity"].iloc[0])
+        new_value = float(row["estimated quantity"])
 
         # Update completed
-        df_updated.loc[mask, "Completed"] = new_value
+        df_updated.loc[mask, "estimated quantity"] = new_value
 
         # Auto date logic
-        if (old_value is False) and (new_value is True):
-            df_updated.loc[mask, "Date"] = today
+        # if (old_value is False) and (new_value is True):
+        #     df_updated.loc[mask, "Date"] = today
 
-        elif (old_value is True) and (new_value is False):
-            df_updated.loc[mask, "Date"] = pd.NaT
+        # elif (old_value is True) and (new_value is False):
+        #     df_updated.loc[mask, "Date"] = pd.NaT
 
     # Format dates
     df_updated["Date"] = pd.to_datetime(df_updated["Date"])
@@ -285,7 +285,7 @@ if selected_work_unit:
     detail_df = df[
         df["Key"] == selected_key
     ][
-        ["Rule of credit", "Completed", "Date", "Comments"]
+        ["material", "estimated quantity", "actual quantity", "Units","Date", "Comments"]
     ].copy()
 
     # -----------------------------
@@ -299,8 +299,17 @@ if selected_work_unit:
             hide_index=True,
             num_rows="fixed",
             column_config={
-                "Completed": st.column_config.CheckboxColumn(
-                    "Completed"
+                "material": st.column_config.TextColumn(
+                    "Material"
+                ),
+                "estimated quantity": st.column_config.NumberColumn(
+                    "Estimated Quantity"
+                ),
+                "actual quantity": st.column_config.NumberColumn(
+                    "Actual Quantity"
+                ),
+                "Units": st.column_config.TextColumn(
+                    "Units"
                 ),
                 "Date": st.column_config.DateColumn(
                     "Date",
@@ -326,12 +335,14 @@ if selected_work_unit:
             mask = (
                 (df_updated["Key"] == selected_key) &
                 (
-                    df_updated["Rule of credit"]
-                    == row["Rule of credit"]
+                    df_updated["material"]
+                    == row["material"]
                 )
             )
 
-            new_completed = bool(row["Completed"])
+            new_estimated_quantity = float(row["estimated quantity"])
+            new_actual_quantity = float(row["actual quantity"])
+            new_units = str(row["Units"])
             new_date = pd.to_datetime(row["Date"], errors="coerce")
             new_comment = str(row["Comments"])
 
@@ -342,7 +353,9 @@ if selected_work_unit:
             if new_completed is False:
                 new_date = pd.NaT
 
-            df_updated.loc[mask, "Completed"] = new_completed
+            df_updated.loc[mask, "estimated quantity"] = new_estimated_quantity
+            df_updated.loc[mask, "actual quantity"] = new_actual_quantity
+            df_updated.loc[mask, "Units"] = new_units
             df_updated.loc[mask, "Date"] = new_date
             df_updated.loc[mask, "Comments"] = new_comment
 
