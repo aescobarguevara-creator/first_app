@@ -154,7 +154,7 @@ df_filtered = df4[df4["M - Cost code"].isin(cost_code)]
 # -----------------------------
 st.markdown("## Material Usage Tracking")
 
-material_order = df_filtered["material"].drop_duplicates().tolist()
+material_order = df_filtered["Material"].drop_duplicates().tolist()
 
 df_filtered["Material"] = pd.Categorical(
     df_filtered["Material"],
