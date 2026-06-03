@@ -72,7 +72,7 @@ def load_data():
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 
     # Unique group key
-    df["Key"] = (df["Widget"] != df["Widget"].shift()).cumsum()
+    df["Key"] = (df["Work Unit"] != df["Work Unit"].shift()).cumsum()
 
     return df
 
