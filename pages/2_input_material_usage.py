@@ -156,16 +156,16 @@ st.markdown("## Material Usage Tracking")
 
 material_order = df_filtered["material"].drop_duplicates().tolist()
 
-df_filtered["material"] = pd.Categorical(
-    df_filtered["material"],
+df_filtered["Material"] = pd.Categorical(
+    df_filtered["Material"],
     categories=material_order,
     ordered=True
 )
 
 df_pivot = df_filtered.pivot_table(
     index=["Key", "Work Unit"],
-    columns="material",
-    values="estimated quantity",
+    columns="Material",
+    values="Estimated Quantity",
     aggfunc="max",
     fill_value=False
 ).reset_index()
@@ -211,26 +211,26 @@ if save_progress:
     df_melted = edited_df.melt(
         id_vars=["Key", "Work Unit"],
         value_vars=material_cols,
-        var_name="material",
-        value_name="estimated quantity"
+        var_name="Material",
+        value_name="Estimated Quantity"
     )
 
-    df_melted["estimated quantity"] = df_melted["estimated quantity"].astype(float)
+    df_melted["Estimated Quantity"] = df_melted["Estimated Quantity"].astype(float)
 
     for _, row in df_melted.iterrows():
 
         mask = (
             (df_updated["Key"] == row["Key"]) &
-            (df_updated["material"] == row["material"])
+            (df_updated["Material"] == row["Material"])
         )
 
         st.write(mask.sum())
 
-        old_value = float(df.loc[mask, "estimated quantity"].iloc[0])
-        new_value = float(row["estimated quantity"])
+        old_value = float(df.loc[mask, "Estimated Quantity"].iloc[0])
+        new_value = float(row["Estimated Quantity"])
 
         # Update completed
-        df_updated.loc[mask, "estimated quantity"] = new_value
+        df_updated.loc[mask, "Estimated Quantity"] = new_value
 
         # Auto date logic
         # if (old_value is False) and (new_value is True):
@@ -285,7 +285,7 @@ if selected_work_unit:
     detail_df = df[
         df["Key"] == selected_key
     ][
-        ["material", "estimated quantity", "actual quantity", "Units","Date", "Comments"]
+        ["Material", "Estimated Quantity", "Actual Quantity", "Units","Date", "Comments"]
     ].copy()
 
     # -----------------------------
@@ -299,13 +299,13 @@ if selected_work_unit:
             hide_index=True,
             num_rows="fixed",
             column_config={
-                "material": st.column_config.TextColumn(
+                "Material": st.column_config.TextColumn(
                     "Material"
                 ),
-                "estimated quantity": st.column_config.NumberColumn(
+                "Estimated Quantity": st.column_config.NumberColumn(
                     "Estimated Quantity"
                 ),
-                "actual quantity": st.column_config.NumberColumn(
+                "Actual Quantity": st.column_config.NumberColumn(
                     "Actual Quantity"
                 ),
                 "Units": st.column_config.TextColumn(
@@ -335,13 +335,13 @@ if selected_work_unit:
             mask = (
                 (df_updated["Key"] == selected_key) &
                 (
-                    df_updated["material"]
-                    == row["material"]
+                    df_updated["Material"]
+                    == row["Material"]
                 )
             )
 
-            new_estimated_quantity = float(row["estimated quantity"])
-            new_actual_quantity = float(row["actual quantity"])
+            new_estimated_quantity = float(row["Estimated Quantity"])
+            new_actual_quantity = float(row["Actual Quantity"])
             new_units = str(row["Units"])
             new_date = pd.to_datetime(row["Date"], errors="coerce")
             new_comment = str(row["Comments"])
@@ -353,8 +353,8 @@ if selected_work_unit:
             if new_completed is False:
                 new_date = pd.NaT
 
-            df_updated.loc[mask, "estimated quantity"] = new_estimated_quantity
-            df_updated.loc[mask, "actual quantity"] = new_actual_quantity
+            df_updated.loc[mask, "Estimated Quantity"] = new_estimated_quantity
+            df_updated.loc[mask, "Actual Quantity"] = new_actual_quantity
             df_updated.loc[mask, "Units"] = new_units
             df_updated.loc[mask, "Date"] = new_date
             df_updated.loc[mask, "Comments"] = new_comment
