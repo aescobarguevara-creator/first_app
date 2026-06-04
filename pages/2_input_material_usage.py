@@ -236,64 +236,64 @@ else:
 
         save_progress = st.form_submit_button("Save Actual Quantities")
 
-# -----------------------------
-# SAVE ACTUAL QUANTITIES LOGIC
-# -----------------------------
-if save_progress:
+    # -----------------------------
+    # SAVE ACTUAL QUANTITIES LOGIC
+    # -----------------------------
+    if save_progress:
 
-    df_updated = df.copy()
+        df_updated = df.copy()
 
-    today = pd.Timestamp.today().normalize()
+        today = pd.Timestamp.today().normalize()
 
-    # Unpivot
-    df_melted = edited_df.melt(
-        id_vars=["Key", "Work Unit"],
-        value_vars=material_cols,
-        var_name="Material",
-        value_name="Actual Quantity"
-    )
-
-    df_melted["Actual Quantity"] = df_melted["Actual Quantity"].astype(float)
-
-    for _, row in df_melted.iterrows():
-
-        mask = (
-            (df_updated["Key"] == row["Key"]) &
-            (df_updated["Material"] == row["Material"])
+        # Unpivot
+        df_melted = edited_df.melt(
+            id_vars=["Key", "Work Unit"],
+            value_vars=material_cols,
+            var_name="Material",
+            value_name="Actual Quantity"
         )
 
-        # st.write(mask.sum())
+        df_melted["Actual Quantity"] = df_melted["Actual Quantity"].astype(float)
 
-        old_value = float(df.loc[mask, "Actual Quantity"].iloc[0])
-        new_value = float(row["Actual Quantity"])
+        for _, row in df_melted.iterrows():
 
-        # Update completed
-        df_updated.loc[mask, "Actual Quantity"] = new_value
+            mask = (
+                (df_updated["Key"] == row["Key"]) &
+                (df_updated["Material"] == row["Material"])
+            )
 
-        # Auto date logic
-        # if (old_value is False) and (new_value is True):
-        #     df_updated.loc[mask, "Date"] = today
+            # st.write(mask.sum())
 
-        # elif (old_value is True) and (new_value is False):
-        #     df_updated.loc[mask, "Date"] = pd.NaT
+            old_value = float(df.loc[mask, "Actual Quantity"].iloc[0])
+            new_value = float(row["Actual Quantity"])
 
-    # Format dates
-    df_updated["Date"] = pd.to_datetime(df_updated["Date"])
-    df_updated["Date"] = df_updated["Date"].dt.strftime("%Y-%m-%d")
-    df_updated["Date"] = df_updated["Date"].fillna("")
+            # Update completed
+            df_updated.loc[mask, "Actual Quantity"] = new_value
 
-    # Push to sheet
-    sheet.update(
-        [df_updated.columns.values.tolist()] +
-        df_updated.values.tolist()
-    )
+            # Auto date logic
+            # if (old_value is False) and (new_value is True):
+            #     df_updated.loc[mask, "Date"] = today
 
-    st.toast("Actual Quantities Updated!", icon="✅")
+            # elif (old_value is True) and (new_value is False):
+            #     df_updated.loc[mask, "Date"] = pd.NaT
 
-    time.sleep(1)
+        # Format dates
+        df_updated["Date"] = pd.to_datetime(df_updated["Date"])
+        df_updated["Date"] = df_updated["Date"].dt.strftime("%Y-%m-%d")
+        df_updated["Date"] = df_updated["Date"].fillna("")
 
-    st.cache_data.clear()
-    st.rerun()
+        # Push to sheet
+        sheet.update(
+            [df_updated.columns.values.tolist()] +
+            df_updated.values.tolist()
+        )
+
+        st.toast("Actual Quantities Updated!", icon="✅")
+
+        time.sleep(1)
+
+        st.cache_data.clear()
+        st.rerun()
 
 # =========================================================
 # DETAIL EDITOR
