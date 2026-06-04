@@ -224,7 +224,7 @@ if save_progress:
             (df_updated["Rule of credit"] == row["Rule of credit"])
         )
 
-        st.write(mask.sum())
+        # st.write(mask.sum())
 
         old_value = bool(df.loc[mask, "Completed"].iloc[0])
         new_value = bool(row["Completed"])
