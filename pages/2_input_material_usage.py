@@ -156,6 +156,13 @@ st.markdown("## Material Usage Tracking")
 
 material_order = df_filtered["Material"].drop_duplicates().tolist()
 
+material_units = (
+    df_filtered.groupby("Material")["Units"]
+    .first()
+    .to_dict()
+)
+
+
 df_filtered["Material"] = pd.Categorical(
     df_filtered["Material"],
     categories=material_order,
@@ -176,7 +183,14 @@ exclude_cols = ["Key", "Work Unit"]
 
 material_cols = [c for c in df_pivot.columns if c not in exclude_cols]
 
+rename_dict = {
+    m: f"{m} ({material_units.get(m, '')})"
+    for m in material_cols
+}
+
 df_pivot[material_cols] = df_pivot[material_cols].astype(float)
+
+df_pivot = df_pivot.rename(columns=rename_dict)
 
 column_config = {
     col: st.column_config.NumberColumn(col)
