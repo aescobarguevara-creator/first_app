@@ -203,10 +203,10 @@ rename_dict = {
 
 df_pivot[material_cols] = df_pivot[material_cols].astype(float)
 
-df_pivot = df_pivot.rename(columns=rename_dict)
-
 column_config = {
-    col: st.column_config.NumberColumn(col)
+    col: st.column_config.NumberColumn(
+        f"{col} ({material_units.get(col, '')})"
+    )
     for col in material_cols
 }
 
@@ -262,7 +262,7 @@ if save_progress:
             (df_updated["Material"] == row["Material"])
         )
 
-        st.write(mask.sum())
+        # st.write(mask.sum())
 
         old_value = float(df.loc[mask, "Actual Quantity"].iloc[0])
         new_value = float(row["Actual Quantity"])
