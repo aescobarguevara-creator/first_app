@@ -237,7 +237,7 @@ else:
         save_progress = st.form_submit_button("Save Actual Quantities")
 
 # -----------------------------
-# SAVE PROGRESS LOGIC
+# SAVE ACTUAL QUANTITIES LOGIC
 # -----------------------------
 if save_progress:
 
@@ -288,7 +288,7 @@ if save_progress:
         df_updated.values.tolist()
     )
 
-    st.toast("Progress updated!", icon="✅")
+    st.toast("Actual Quantities Updated!", icon="✅")
 
     time.sleep(1)
 
