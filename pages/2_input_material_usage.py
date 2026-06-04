@@ -169,10 +169,23 @@ df_filtered["Material"] = pd.Categorical(
     ordered=True
 )
 
+mode = st.radio(
+    "Quantity Type",
+    ["Estimated", "Actual"],
+    horizontal=True
+)
+
+value_column = (
+    "Estimated Quantity"
+    if mode == "Estimated"
+    else "Actual Quantity"
+)
+
+
 df_pivot = df_filtered.pivot_table(
     index=["Key", "Work Unit"],
     columns="Material",
-    values="Estimated Quantity",
+    values=value_column,
     aggfunc="max",
     fill_value=False
 ).reset_index()
@@ -200,17 +213,28 @@ column_config = {
 # -----------------------------
 # FORM 1 - SAVE PROGRESS
 # -----------------------------
-with st.form("progress_form"):
 
-    edited_df = st.data_editor(
+if mode == "Estimated":
+
+    st.dataframe(
         df_pivot,
         width="stretch",
-        hide_index=True,
-        column_config=column_config,
-        num_rows="fixed"
+        hide_index=True
     )
 
-    save_progress = st.form_submit_button("Save Material Quantities")
+else:
+
+    with st.form("actual_form"):
+
+        edited_df = st.data_editor(
+            df_pivot,
+            width="stretch",
+            hide_index=True,
+            column_config=column_config,
+            num_rows="fixed"
+        )
+
+        save_progress = st.form_submit_button("Save Actual Quantities")
 
 # -----------------------------
 # SAVE PROGRESS LOGIC
@@ -226,10 +250,10 @@ if save_progress:
         id_vars=["Key", "Work Unit"],
         value_vars=material_cols,
         var_name="Material",
-        value_name="Estimated Quantity"
+        value_name="Actual Quantity"
     )
 
-    df_melted["Estimated Quantity"] = df_melted["Estimated Quantity"].astype(float)
+    df_melted["Actual Quantity"] = df_melted["Actual Quantity"].astype(float)
 
     for _, row in df_melted.iterrows():
 
@@ -240,11 +264,11 @@ if save_progress:
 
         st.write(mask.sum())
 
-        old_value = float(df.loc[mask, "Estimated Quantity"].iloc[0])
-        new_value = float(row["Estimated Quantity"])
+        old_value = float(df.loc[mask, "Actual Quantity"].iloc[0])
+        new_value = float(row["Actual Quantity"])
 
         # Update completed
-        df_updated.loc[mask, "Estimated Quantity"] = new_value
+        df_updated.loc[mask, "Actual Quantity"] = new_value
 
         # Auto date logic
         # if (old_value is False) and (new_value is True):
