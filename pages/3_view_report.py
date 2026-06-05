@@ -152,8 +152,8 @@ df_filtered = df4[df4["LE - Cost code"].isin(cost_code)]
 # Date range filter
 #------------------------------
 
-min_date = df["Date"].min()
-max_date = df["Date"].max()
+min_date = df_filtered["Date"].min()
+max_date = df_filtered["Date"].max()
 
 date_range = st.slider(
     "Timeline",
@@ -314,10 +314,12 @@ else:
 
         y_max = chart_df.drop(columns="Date").max().max()
 
-        chart_df_plot = chart_df[
-            (chart_df["Date"] >= pd.to_datetime(start_filter)) &
-            (chart_df["Date"] <= pd.to_datetime(end_filter))
-            ]
+        chart_df_plot = chart_df.copy()
+
+        # chart_df_plot = chart_df[
+        #     (chart_df["Date"] >= pd.to_datetime(start_filter)) &
+        #     (chart_df["Date"] <= pd.to_datetime(end_filter))
+        #     ]
         
         plot_cols = ["Date"] + list(chart_df_plot.columns[1:][::-1])
 
@@ -336,6 +338,13 @@ else:
                     fill="tozeroy"
                 )
             )
+
+        fig.update_xaxes(
+            range=[
+                pd.to_datetime(start_filter),
+                pd.to_datetime(end_filter)
+            ]
+        )
 
         fig.update_yaxes(
             range=[0, y_max]
