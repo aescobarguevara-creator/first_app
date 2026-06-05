@@ -387,7 +387,7 @@ else:
             if total_widgets > 0 else 0
         )
 
-        total_days = (end_date - start_date).days + 1
+        total_days = (end_filter - start_filter).days + 1
 
         production_to_date = (
             completed_widgets / (total_days / 7)
