@@ -341,8 +341,8 @@ else:
 
         fig.update_xaxes(
             range=[
-                pd.to_datetime(start_filter),
-                pd.to_datetime(end_filter)
+                pd.to_datetime(min_date),
+                pd.to_datetime(max_date)
             ]
         )
 
