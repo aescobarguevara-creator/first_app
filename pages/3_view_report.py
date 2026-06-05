@@ -167,6 +167,11 @@ date_range = st.slider(
 
 start_filter, end_filter = date_range
 
+df_filtered_time = df_filtered[
+    (df_filtered["Date"] >= pd.to_datetime(start_filter)) &
+    (df_filtered["Date"] <= pd.to_datetime(end_filter))
+]
+
 # -----------------------------
 # BURNDOWN CURVE
 # -----------------------------
@@ -356,18 +361,22 @@ else:
         # -----------------------------
 
         final_roc = roc_order[-1]
-        df_final = df_filtered[
+        df_final_total = df_filtered[
             df_filtered["Rule of credit"] == final_roc
+        ]
+
+        df_final_time = df_filtered_time[
+            df_filtered_time["Rule of credit"] == final_roc
         ]
 
         #-----------------------------
         # Calculate metrics
         #-----------------------------
 
-        total_widgets = df_final["Work Unit"].nunique()
+        total_widgets = df_final_total["Work Unit"].nunique()
 
         completed_widgets = (
-            df_final[df_final["Completed"] == True]["Work Unit"]
+            df_final_time[df_final_time["Completed"] == True]["Work Unit"]
             .nunique()
         )
 
