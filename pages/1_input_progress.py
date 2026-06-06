@@ -164,7 +164,7 @@ df_filtered["Rule of Credit"] = pd.Categorical(
 
 df_pivot = df_filtered.pivot_table(
     index=["Key", "Work Unit"],
-    columns="Rule of credit",
+    columns="Rule of Credit",
     values="Completed",
     aggfunc="max",
     fill_value=False
