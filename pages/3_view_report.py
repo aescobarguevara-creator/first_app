@@ -40,16 +40,25 @@ def init_connection():
 
 client = init_connection()
 
-sheet = client.open("progress report - original").sheet1
+progress_sheet = (
+    client
+    .open("progress report - original")
+    .worksheet("progress")
+)
 
+material_sheet = (
+    client
+    .open("progress report - original")
+    .worksheet("material")
+)
 
 # -----------------------------
 # LOAD DATA
 # -----------------------------
 @st.cache_data
-def load_data():
+def load_progress_data():
 
-    data = sheet.get_all_records()
+    data = progress_sheet.get_all_records()
 
     df = pd.DataFrame(data)
 
@@ -76,7 +85,44 @@ def load_data():
     return df
 
 
-df = load_data()
+@st.cache_data
+def load_material_data():
+
+    data = material_sheet.get_all_records()
+
+    df = pd.DataFrame(data)
+
+    # Dates
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+
+    # Comments
+    df["Comments"] = df["Comments"].fillna("").astype(str)
+
+    return df
+
+df_progress = load_progress_data()
+df_materials = load_material_data()
+
+
+#-----------------------------
+# Merging progress and material data
+#-----------------------------
+
+date_lookup = (
+    df_progress[
+        ["Key", "Rule of credit", "Date"]
+    ]
+    .dropna(subset=["Date"])
+    .drop_duplicates(
+        subset=["Key", "Rule of credit"]
+    )
+)
+
+df_materials = df_materials.merge(
+    date_lookup,
+    on=["Key", "Rule of credit"],
+    how="left"
+)
 
 # -----------------------------
 # BACKGROUND COLOR
@@ -108,16 +154,16 @@ if st.button("🔄 Refresh Data"):
     st.rerun()
 
 # -----------------------------
-# FILTERS
+# FILTERS FOR PROGRESS DATA
 # -----------------------------
 st.markdown("### Filters")
 
 col1, col2, col3, col4 = st.columns(4)
 
-projects = df["Project"].dropna().unique()
+projects = df_progress["Project"].dropna().unique()
 project = col1.selectbox("Project", projects)
 
-df1 = df[df["Project"] == project]
+df1 = df_progress[df_progress["Project"] == project]
 
 disciplines = df1["Discipline"].dropna().unique()
 discipline = col2.selectbox("Discipline", disciplines)
@@ -146,14 +192,14 @@ cost_code = col5.multiselect(
     placeholder = 'Multiple Selection allowed'
 )
 
-df_filtered = df4[df4["LE - Cost code"].isin(cost_code)]
+df_progress_filtered = df4[df4["LE - Cost code"].isin(cost_code)]
 
 #------------------------------
 # Date range filter
 #------------------------------
 
-min_date = df_filtered["Date"].min()
-max_date = df_filtered["Date"].max()
+min_date = df_progress_filtered["Date"].min()
+max_date = df_progress_filtered["Date"].max()
 
 date_range = st.slider(
     "Timeline",
@@ -167,9 +213,9 @@ date_range = st.slider(
 
 start_filter, end_filter = date_range
 
-df_filtered_time = df_filtered[
-    (df_filtered["Date"] >= pd.to_datetime(start_filter)) &
-    (df_filtered["Date"] <= pd.to_datetime(end_filter))
+df_progress_filtered_time = df_progress_filtered[
+    (df_progress_filtered["Date"] >= pd.to_datetime(start_filter)) &
+    (df_progress_filtered["Date"] <= pd.to_datetime(end_filter))
 ]
 
 # -----------------------------
@@ -180,18 +226,18 @@ st.markdown("### Burndown Curve")
 
 # Preserve original ROC order
 roc_order = (
-    df_filtered["Rule of credit"]
+    df_progress_filtered["Rule of credit"]
     .drop_duplicates()
     .tolist()
 )
 
 # Keep only completed items with valid dates
-df_burn = df_filtered[
-    (df_filtered["Completed"] == True) &
-    (df_filtered["Date"].notna())
+df_burn = df_progress_filtered[
+    (df_progress_filtered["Completed"] == True) &
+    (df_progress_filtered["Date"].notna())
 ].copy()
 
-if df_filtered.empty:
+if df_progress_filtered.empty:
 
     st.warning("No data available for selected filters.")
 
@@ -202,8 +248,8 @@ else:
     # -----------------------------
 
     today = pd.Timestamp.today().normalize()
-    start_date = df_filtered["Date"].min()
-    end_date = df_filtered["Date"].max()
+    start_date = df_progress_filtered["Date"].min()
+    end_date = df_progress_filtered["Date"].max()
 
     # Fallback if no dates exist yet
     if pd.isna(start_date) or pd.isna(end_date):
@@ -274,8 +320,8 @@ else:
 
             # Total planned scope
             total = (
-                df_filtered[
-                    df_filtered["Rule of credit"] == roc
+                df_progress_filtered[
+                    df_progress_filtered["Rule of credit"] == roc
                 ]
                 .shape[0]
             )
@@ -368,12 +414,12 @@ else:
         # -----------------------------
 
         final_roc = roc_order[-1]
-        df_final_total = df_filtered[
-            df_filtered["Rule of credit"] == final_roc
+        df_final_total = df_progress_filtered[
+            df_progress_filtered["Rule of credit"] == final_roc
         ]
 
-        df_final_time = df_filtered_time[
-            df_filtered_time["Rule of credit"] == final_roc
+        df_final_time = df_progress_filtered_time[
+            df_progress_filtered_time["Rule of credit"] == final_roc
         ]
 
         #-----------------------------
@@ -455,8 +501,13 @@ else:
                 width="stretch"
             )
 
+# ------------------------------
+# MATERIAL USAGE ANALYSIS
+# -------------------------------
 
-        st.markdown("### Material usage")
+st.markdown("### Material usage")
+
+
 
 # Run local
 # py -m streamlit run progress_v6.py
