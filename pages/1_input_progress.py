@@ -154,10 +154,10 @@ df_filtered = df4[df4["LE - Cost code"].isin(cost_code)]
 # -----------------------------
 st.markdown("## Progress Tracking")
 
-roc_order = df_filtered["Rule of credit"].drop_duplicates().tolist()
+roc_order = df_filtered["Rule of Credit"].drop_duplicates().tolist()
 
-df_filtered["Rule of credit"] = pd.Categorical(
-    df_filtered["Rule of credit"],
+df_filtered["Rule of Credit"] = pd.Categorical(
+    df_filtered["Rule of Credit"],
     categories=roc_order,
     ordered=True
 )
@@ -211,7 +211,7 @@ if save_progress:
     df_melted = edited_df.melt(
         id_vars=["Key", "Work Unit"],
         value_vars=roc_cols,
-        var_name="Rule of credit",
+        var_name="Rule of Credit",
         value_name="Completed"
     )
 
@@ -221,7 +221,7 @@ if save_progress:
 
         mask = (
             (df_updated["Key"] == row["Key"]) &
-            (df_updated["Rule of credit"] == row["Rule of credit"])
+            (df_updated["Rule of Credit"] == row["Rule of Credit"])
         )
 
         # st.write(mask.sum())
@@ -285,7 +285,7 @@ if selected_work_unit:
     detail_df = df[
         df["Key"] == selected_key
     ][
-        ["Rule of credit", "Completed", "Date", "Comments"]
+        ["Rule of Credit", "Completed", "Date", "Comments"]
     ].copy()
 
     # -----------------------------
@@ -326,8 +326,8 @@ if selected_work_unit:
             mask = (
                 (df_updated["Key"] == selected_key) &
                 (
-                    df_updated["Rule of credit"]
-                    == row["Rule of credit"]
+                    df_updated["Rule of Credit"]
+                    == row["Rule of Credit"]
                 )
             )
 
