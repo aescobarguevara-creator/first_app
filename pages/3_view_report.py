@@ -118,6 +118,8 @@ date_lookup = (
     )
 )
 
+df_materials = df_materials.drop(columns=["Date"], errors="ignore")
+
 df_materials = df_materials.merge(
     date_lookup,
     on=["Key", "Rule of Credit"],
