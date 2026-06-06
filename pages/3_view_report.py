@@ -110,11 +110,11 @@ df_materials = load_material_data()
 
 date_lookup = (
     df_progress[
-        ["Key", "Rule of credit", "Date"]
+        ["Key", "Rule of Credit", "Date"]
     ]
     .dropna(subset=["Date"])
     .drop_duplicates(
-        subset=["Key", "Rule of credit"]
+        subset=["Key", "Rule of Credit"]
     )
 )
 
@@ -226,7 +226,7 @@ st.markdown("### Burndown Curve")
 
 # Preserve original ROC order
 roc_order = (
-    df_progress_filtered["Rule of credit"]
+    df_progress_filtered["Rule of Credit"]
     .drop_duplicates()
     .tolist()
 )
@@ -282,7 +282,7 @@ else:
             # Daily counts
             counts = (
                 df_burn[
-                    df_burn["Rule of credit"] == roc
+                    df_burn["Rule of Credit"] == roc
                 ]
                 .groupby("Date")
                 .size()
@@ -321,7 +321,7 @@ else:
             # Total planned scope
             total = (
                 df_progress_filtered[
-                    df_progress_filtered["Rule of credit"] == roc
+                    df_progress_filtered["Rule of Credit"] == roc
                 ]
                 .shape[0]
             )
@@ -415,11 +415,11 @@ else:
 
         final_roc = roc_order[-1]
         df_final_total = df_progress_filtered[
-            df_progress_filtered["Rule of credit"] == final_roc
+            df_progress_filtered["Rule of Credit"] == final_roc
         ]
 
         df_final_time = df_progress_filtered_time[
-            df_progress_filtered_time["Rule of credit"] == final_roc
+            df_progress_filtered_time["Rule of Credit"] == final_roc
         ]
 
         #-----------------------------
