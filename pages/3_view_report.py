@@ -124,6 +124,8 @@ df_materials = df_materials.merge(
     how="left"
 )
 
+df_materials["Date"] = pd.to_datetime(df_materials["Date"], errors="coerce")
+
 # -----------------------------
 # BACKGROUND COLOR
 # -----------------------------
