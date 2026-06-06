@@ -120,7 +120,7 @@ date_lookup = (
 
 df_materials = df_materials.merge(
     date_lookup,
-    on=["Key", "Rule of credit"],
+    on=["Key", "Rule of Credit"],
     how="left"
 )
 
