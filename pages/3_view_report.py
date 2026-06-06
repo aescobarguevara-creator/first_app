@@ -557,7 +557,7 @@ summary["Remaining"] = (
 )
 
 summary["% Difference"] = (
-    (summary["Actual Total"] - summary["Estimate Quantity"]) / 100
+    (summary["Actual Total"] - summary["Estimated Quantity"]) / 100
 )
 
 # ------------------------------
