@@ -124,6 +124,10 @@ df_materials = df_materials.merge(
     how="left"
 )
 
+st.write(df_materials.columns)
+st.write(df_progress.columns)
+st.write(date_lookup.head())
+
 df_materials["Date"] = pd.to_datetime(df_materials["Date"], errors="coerce")
 
 # -----------------------------
