@@ -564,6 +564,9 @@ summary["% Difference"] = (
 # PLOTTING MATERIAL USAGE ANALYSIS
 # -------------------------------
 
+st.write("SUMMARY SHAPE:", summary.shape)
+st.write(summary.head())
+
 cols = st.columns(3)  # grid layout
 
 for i, row in summary.iterrows():
@@ -571,7 +574,7 @@ for i, row in summary.iterrows():
     material = row["Material"]
     actual_total = row["Actual Total"]
     actual_to_date = row["Actual To Date"]
-    estimate = row["Estimate Quantity"]
+    estimate = row["Estimated Quantity"]
     remaining = row["Remaining"]
 
     col = cols[i % 3]
