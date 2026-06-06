@@ -194,6 +194,20 @@ cost_code = col5.multiselect(
 
 df_progress_filtered = df4[df4["LE - Cost code"].isin(cost_code)]
 
+#-----------------------------
+# Filters for materials data
+#-----------------------------
+
+df_materials_filtered = df_materials[
+    (df_materials["Project"] == project) &
+    (df_materials["Discipline"] == discipline) &
+    (df_materials["Area"] == area) &
+    (df_materials["Task"] == task) &
+    (df_materials["LE - Cost code"].isin(cost_code))
+]
+
+# Intermediate dfs are only needed to populate filter options, so we can clean them up to save memory
+
 #------------------------------
 # Date range filter
 #------------------------------
@@ -216,6 +230,11 @@ start_filter, end_filter = date_range
 df_progress_filtered_time = df_progress_filtered[
     (df_progress_filtered["Date"] >= pd.to_datetime(start_filter)) &
     (df_progress_filtered["Date"] <= pd.to_datetime(end_filter))
+]
+
+df_materials_filtered_time = df_materials_filtered[
+    (df_materials_filtered["Date"] >= pd.to_datetime(start_filter)) &
+    (df_materials_filtered["Date"] <= pd.to_datetime(end_filter))
 ]
 
 # -----------------------------
@@ -506,6 +525,82 @@ else:
 # -------------------------------
 
 st.markdown("### Material usage")
+
+summary = df_materials_filtered.groupby("Material").agg({
+    "Estimate Quantity": "sum",
+    "Actual Quantity": "sum"
+}).reset_index()
+
+to_date = df_materials_filtered_time.groupby("Material").agg({
+    "Actual Quantity": "sum"
+}).reset_index()
+
+summary = summary.merge(to_date, on="Material", how="left")
+
+summary = summary.rename(columns={
+    "Actual Quantity_x": "Actual Total",
+    "Actual Quantity_y": "Actual To Date"
+})
+
+summary["Actual To Date"] = summary["Actual To Date"].fillna(0)
+
+summary["Remaining"] = (
+    summary["Actual Total"] - summary["Actual To Date"]
+)
+
+summary["% Difference"] = (
+    (summary["Actual Total"] - summary["Estimate Quantity"]) / 100
+)
+
+# ------------------------------
+# PLOTTING MATERIAL USAGE ANALYSIS
+# -------------------------------
+
+cols = st.columns(3)  # grid layout
+
+for i, row in summary.iterrows():
+
+    material = row["Material"]
+    actual_total = row["Actual Total"]
+    actual_to_date = row["Actual To Date"]
+    estimate = row["Estimate Quantity"]
+    remaining = row["Remaining"]
+
+    col = cols[i % 3]
+
+    with col:
+
+        fig = go.Figure(go.Indicator(
+            mode="gauge+number+delta",
+            value=actual_to_date,
+            delta={
+                "reference": actual_total,
+                "valueformat": ".2f",
+                "position": "top"
+            },
+            title={"text": material},
+            gauge={
+                "axis": {
+                    "range": [0, max(actual_total * 1.1, 1)]
+                },
+                "bar": {"color": "royalblue"},
+                "steps": [
+                    {"range": [0, actual_total * 0.7], "color": "#f7f7f7"},
+                    {"range": [actual_total * 0.7, actual_total], "color": "#d9f2ff"},
+                ],
+                "threshold": {
+                    "line": {"color": "red", "width": 3},
+                    "thickness": 0.75,
+                    "value": actual_total
+                }
+            }
+        ))
+
+        fig.update_layout(height=250, margin=dict(l=10, r=10, t=40, b=10))
+
+        st.plotly_chart(fig, use_container_width=True)
+
+
 
 
 
