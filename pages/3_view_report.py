@@ -203,7 +203,7 @@ df_materials_filtered = df_materials[
     (df_materials["Discipline"] == discipline) &
     (df_materials["Area"] == area) &
     (df_materials["Task"] == task) &
-    (df_materials["LE - Cost code"].isin(cost_code))
+    (df_materials["M - Cost code"].isin(cost_code))
 ]
 
 # Intermediate dfs are only needed to populate filter options, so we can clean them up to save memory
