@@ -608,7 +608,7 @@ for i, row in summary.iterrows():
             }
         ))
 
-        fig.update_layout(height=280, margin=dict(l=30, r=30, t=80, b=10))
+        fig.update_layout(height=280, margin=dict(l=30, r=30, t=150, b=10))
 
         st.metric(
             label="Estimate vs Actual",
