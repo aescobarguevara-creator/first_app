@@ -618,7 +618,11 @@ for i, row in summary.iterrows():
         #     value=f"{pct_diff:.1f}%"
         # )
 
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(
+            fig, 
+            use_container_width=True,
+            key=f"gauge_{i}"
+        )
 
 st.write(summary)
 
