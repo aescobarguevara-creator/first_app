@@ -586,7 +586,7 @@ for i, row in summary.iterrows():
             title={
                 "text": (
                     f"<b>{material}</b><br>"
-                    f"<span style='font-size:9px;color:gray'>{units}</span>"
+                    f"<span style='font-size:10px;color:gray'>{units}</span>"
                 )
             },
             gauge={
@@ -608,7 +608,7 @@ for i, row in summary.iterrows():
             }
         ))
 
-        fig.update_layout(height=280, margin=dict(l=30, r=30, t=150, b=10))
+        fig.update_layout(height=280, margin=dict(l=30, r=30, t=50, b=10))
 
         st.metric(
             label="Estimate vs Actual",
