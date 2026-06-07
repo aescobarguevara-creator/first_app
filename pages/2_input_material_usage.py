@@ -57,6 +57,7 @@ def load_data():
     # Comments
     df["Comments"] = df["Comments"].fillna("").astype(str)
 
+
     return df
 
 
@@ -306,7 +307,7 @@ if selected_work_unit:
     detail_df = df[
         df["Key"] == selected_key
     ][
-        ["Material", "Estimated Quantity", "Actual Quantity", "Units","Date", "Comments"]
+        ["Material", "Estimated Quantity", "Actual Quantity", "Units", "Comments"]
     ].copy()
 
     # -----------------------------
@@ -331,10 +332,6 @@ if selected_work_unit:
                 ),
                 "Units": st.column_config.TextColumn(
                     "Units"
-                ),
-                "Date": st.column_config.DateColumn(
-                    "Date",
-                    format="YYYY-MM-DD"
                 ),
                 "Comments": st.column_config.TextColumn(
                     "Comments"
@@ -364,7 +361,6 @@ if selected_work_unit:
             new_estimated_quantity = float(row["Estimated Quantity"])
             new_actual_quantity = float(row["Actual Quantity"])
             new_units = str(row["Units"])
-            new_date = pd.to_datetime(row["Date"], errors="coerce")
             new_comment = str(row["Comments"])
 
             # Business rule enforcement
@@ -377,13 +373,7 @@ if selected_work_unit:
             df_updated.loc[mask, "Estimated Quantity"] = new_estimated_quantity
             df_updated.loc[mask, "Actual Quantity"] = new_actual_quantity
             df_updated.loc[mask, "Units"] = new_units
-            df_updated.loc[mask, "Date"] = new_date
             df_updated.loc[mask, "Comments"] = new_comment
-
-        # Format dates
-        df_updated["Date"] = pd.to_datetime(df_updated["Date"])
-        df_updated["Date"] = df_updated["Date"].dt.strftime("%Y-%m-%d")
-        df_updated["Date"] = df_updated["Date"].fillna("")
 
         # Push to Google Sheets
         sheet.update(
