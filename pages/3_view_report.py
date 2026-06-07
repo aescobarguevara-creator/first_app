@@ -92,9 +92,6 @@ def load_material_data():
 
     df = pd.DataFrame(data)
 
-    # Dates
-    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
-
     # Comments
     df["Comments"] = df["Comments"].fillna("").astype(str)
 
