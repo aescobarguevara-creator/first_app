@@ -207,7 +207,7 @@ df_materials_filtered = df_materials[
     (df_materials["Project"] == project) &
     (df_materials["Discipline"] == discipline) &
     (df_materials["Area"] == area) &
-    (df_materials["Task"] == task) &
+    (df_materials["Task"] == task)
     # (df_materials["M - Cost code"].isin(cost_code))
 ]
 
