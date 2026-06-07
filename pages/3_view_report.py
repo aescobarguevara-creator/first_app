@@ -585,7 +585,7 @@ for i, row in summary.iterrows():
             value=actual_to_date,
             title={
                 "text": f"{material} <span style='font-size:8px'>({units})</span>"
-            }
+            },
             gauge={
                 "axis": {
                     "range": [0, max(gauge_max, 1)]
