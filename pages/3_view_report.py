@@ -639,7 +639,7 @@ else:
                 key=f"gauge_{i}"
             )
 
-    with st.expander("See material details"):
+    with st.expander("See material data summary table"):
         st.dataframe(
             summary,
             use_container_width=True
