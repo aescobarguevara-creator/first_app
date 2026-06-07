@@ -588,7 +588,9 @@ for i, row in summary.iterrows():
             },
             gauge={
                 "axis": {
-                    "range": [0, max(gauge_max, 1)]
+                    "range": [0, max(gauge_max, 1)],
+                    "tickmode": "array",
+                    "tickvals": [0, gauge_max*0.3,gauge_max * 0.7, gauge_max]
                 },
                 "bar": {"color": "royalblue"},
                 "steps": [
