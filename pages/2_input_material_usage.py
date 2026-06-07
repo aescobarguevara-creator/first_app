@@ -54,17 +54,6 @@ def load_data():
 
     df = pd.DataFrame(data)
 
-    # Boolean cleanup
-    df["Completed"] = (
-        df["Completed"]
-        .astype(str)
-        .str.strip()
-        .str.lower()
-        .map({"true": True, "false": False})
-        .fillna(False)
-        .astype(bool)
-    )
-
     # Comments
     df["Comments"] = df["Comments"].fillna("").astype(str)
 
