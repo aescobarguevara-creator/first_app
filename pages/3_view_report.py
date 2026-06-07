@@ -563,6 +563,7 @@ summary["% Difference"] = (
 
 st.write("SUMMARY SHAPE:", summary.shape)
 st.write(summary.head())
+st.write(df_materials_filtered.head())
 
 cols = st.columns(3)  # grid layout
 
