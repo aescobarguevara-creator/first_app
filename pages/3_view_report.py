@@ -591,7 +591,7 @@ else:
                 <div style="
                     text-align:center;
                     background-color:#f5f5f5;
-                    color = black;
+                    color: black;
                     padding:4px 8px;
                     border-radius:6px;
                     margin-bottom:5px;
