@@ -586,8 +586,8 @@ for i, row in summary.iterrows():
             },
             delta={
                 "reference": 0,
-                "valueformat": False,
-                "position": ".1f"
+                "valueformat": ".1f",
+                "relative": False
             },
             title={
                 "text": f"{material}<br><span style='font-size:12px'>{units}</span>"
