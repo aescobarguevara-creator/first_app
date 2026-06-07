@@ -579,15 +579,10 @@ for i, row in summary.iterrows():
     with col:
 
         fig = go.Figure(go.Indicator(
-            mode="gauge+number+delta",
+            mode="gauge+number",
             value=actual_to_date,
             number = {
                 "suffix": f" {units}"
-            },
-            delta={
-                "reference": 0,
-                "valueformat": ".1f",
-                "relative": False
             },
             title={
                 "text": f"{material}<br><span style='font-size:12px'>{units}</span>"
@@ -609,7 +604,7 @@ for i, row in summary.iterrows():
             }
         ))
 
-        fig.update_layout(height=250, margin=dict(l=10, r=10, t=40, b=10))
+        fig.update_layout(height=250, margin=dict(l=20, r=20, t=40, b=10))
 
         st.metric(
             label="Estimate vs Actual",
