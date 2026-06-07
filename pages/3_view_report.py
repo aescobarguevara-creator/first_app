@@ -562,77 +562,88 @@ summary["% Difference"] = (
 # PLOTTING MATERIAL USAGE ANALYSIS
 # -------------------------------
 
-cols = st.columns(3)  # grid layout
+if summary.empty:
 
-for i, row in summary.iterrows():
+    st.warning("No material data available for selected filters.")
 
-    material = row["Material"]
-    actual_total = row["Actual Total"]
-    actual_to_date = row["Actual To Date"]
-    estimate = row["Estimated Quantity"]
-    remaining = row["Remaining"]
-    units = row["Units"]
-    pct_diff = row["% Difference"]
+else:
 
-    col = cols[i % 3]
+    cols = st.columns(3)  # grid layout
 
-    gauge_max = max(estimate, actual_total,1)
+    for i, row in summary.iterrows():
 
-    with col:
+        material = row["Material"]
+        actual_total = row["Actual Total"]
+        actual_to_date = row["Actual To Date"]
+        estimate = row["Estimated Quantity"]
+        remaining = row["Remaining"]
+        units = row["Units"]
+        pct_diff = row["% Difference"]
 
-        st.markdown(
-            f"""
-            <div style="
-                text-align:center;
-                background-color:#f5f5f5;
-                padding:4px 8px;
-                border-radius:6px;
-                margin-bottom:5px;
-                font-size:14px;
-                font-weight:600;
-            ">
-                {material} ({units})
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        col = cols[i % 3]
 
-        fig = go.Figure(go.Indicator(
-            mode="gauge+number",
-            value=actual_to_date,
-            gauge={
-                "axis": {
-                    "range": [0, max(gauge_max, 1)],
-                    "tickmode": "array",
-                    "tickvals": [0, gauge_max*0.3,gauge_max * 0.7, gauge_max]
-                },
-                "bar": {"color": "royalblue"},
-                "steps": [
-                    {"range": [0, gauge_max * 0.7], "color": "#f7f7f7"},
-                    {"range": [gauge_max * 0.7, gauge_max], "color": "#d9f2ff"},
-                ],
-                "threshold": {
-                    "line": {"color": "red", "width": 3},
-                    "thickness": 0.75,
-                    "value": estimate
+        gauge_max = max(estimate, actual_total,1)
+
+        with col:
+
+            st.markdown(
+                f"""
+                <div style="
+                    text-align:center;
+                    background-color:#f5f5f5;
+                    color = black;
+                    padding:4px 8px;
+                    border-radius:6px;
+                    margin-bottom:5px;
+                    font-size:14px;
+                    font-weight:600;
+                ">
+                    {material} ({units})
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            fig = go.Figure(go.Indicator(
+                mode="gauge+number",
+                value=actual_to_date,
+                gauge={
+                    "axis": {
+                        "range": [0, max(gauge_max, 1)],
+                        "tickmode": "array",
+                        "tickvals": [0, gauge_max*0.3,gauge_max * 0.7, gauge_max]
+                    },
+                    "bar": {"color": "royalblue"},
+                    "steps": [
+                        {"range": [0, gauge_max * 0.7], "color": "#f7f7f7"},
+                        {"range": [gauge_max * 0.7, gauge_max], "color": "#d9f2ff"},
+                    ],
+                    "threshold": {
+                        "line": {"color": "red", "width": 3},
+                        "thickness": 0.75,
+                        "value": estimate
+                    }
                 }
-            }
-        ))
+            ))
 
-        fig.update_layout(height=280, margin=dict(l=30, r=30, t=40, b=10))
+            fig.update_layout(height=280, margin=dict(l=30, r=30, t=40, b=10))
 
-        # st.metric(
-        #     label="Estimate vs Actual",
-        #     value=f"{pct_diff:.1f}%"
-        # )
+            # st.metric(
+            #     label="Estimate vs Actual",
+            #     value=f"{pct_diff:.1f}%"
+            # )
 
-        st.plotly_chart(
-            fig, 
-            use_container_width=True,
-            key=f"gauge_{i}"
+            st.plotly_chart(
+                fig, 
+                use_container_width=True,
+                key=f"gauge_{i}"
+            )
+
+    with st.expander("See material details"):
+        st.dataframe(
+            summary,
+            use_container_width=True
         )
-
-st.write(summary)
 
 
 # Run local
