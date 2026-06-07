@@ -532,6 +532,7 @@ else:
 st.markdown("### Material usage")
 
 summary = df_materials_filtered.groupby("Material").agg({
+    "Units": "first",
     "Estimated Quantity": "sum",
     "Actual Quantity": "sum"
 }).reset_index()
@@ -554,16 +555,12 @@ summary["Remaining"] = (
 )
 
 summary["% Difference"] = (
-    (summary["Actual Total"] - summary["Estimated Quantity"]) / 100
+    (summary["Actual Total"] - summary["Estimated Quantity"]) / summary["Estimated Quantity"] * 100
 )
 
 # ------------------------------
 # PLOTTING MATERIAL USAGE ANALYSIS
 # -------------------------------
-
-st.write("SUMMARY SHAPE:", summary.shape)
-st.write(summary.head())
-st.write(df_materials_filtered.head())
 
 cols = st.columns(3)  # grid layout
 
@@ -574,6 +571,8 @@ for i, row in summary.iterrows():
     actual_to_date = row["Actual To Date"]
     estimate = row["Estimated Quantity"]
     remaining = row["Remaining"]
+    units = row["Units"]
+    pct_diff = row["% Difference"]
 
     col = cols[i % 3]
 
@@ -582,12 +581,17 @@ for i, row in summary.iterrows():
         fig = go.Figure(go.Indicator(
             mode="gauge+number+delta",
             value=actual_to_date,
-            delta={
-                "reference": actual_total,
-                "valueformat": ".2f",
-                "position": "top"
+            number = {
+                "suffix": f" {units}"
             },
-            title={"text": material},
+            delta={
+                "reference": 0,
+                "valueformat": False,
+                "position": ".1f"
+            },
+            title={
+                "text": f"{material}<br><span style='font-size:12px'>{units}</span>"
+            },
             gauge={
                 "axis": {
                     "range": [0, max(actual_total * 1.1, 1)]
@@ -607,10 +611,14 @@ for i, row in summary.iterrows():
 
         fig.update_layout(height=250, margin=dict(l=10, r=10, t=40, b=10))
 
+        st.metric(
+            label="Estimate vs Actual",
+            value=f"{pct_diff:.1f}%"
+        )
+
         st.plotly_chart(fig, use_container_width=True)
 
-
-
+st.write(summary.head())
 
 
 # Run local
