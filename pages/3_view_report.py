@@ -582,7 +582,15 @@ for i, row in summary.iterrows():
 
         st.markdown(
             f"""
-            <div style='text-align: center; font-size: 16px; font-weight: 600; margin-bottom: 5px;'>
+            <div style="
+                text-align:center;
+                background-color:#f5f5f5;
+                padding:4px 8px;
+                border-radius:6px;
+                margin-bottom:5px;
+                font-size:14px;
+                font-weight:600;
+            ">
                 {material} ({units})
             </div>
             """,
