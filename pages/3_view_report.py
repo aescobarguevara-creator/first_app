@@ -576,35 +576,34 @@ for i, row in summary.iterrows():
 
     col = cols[i % 3]
 
+    gauge_max = max(estimate, actual_total)
+
     with col:
 
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
             value=actual_to_date,
-            number = {
-                "suffix": f" {units}"
-            },
             title={
-                "text": f"{material}<br><span style='font-size:12px'>{units}</span>"
-            },
+                "text": f"{material} <span style='font-size:8px'>({units})</span>"
+            }
             gauge={
                 "axis": {
-                    "range": [0, max(actual_total * 1.1, 1)]
+                    "range": [0, max(gauge_max, 1)]
                 },
                 "bar": {"color": "royalblue"},
                 "steps": [
-                    {"range": [0, actual_total * 0.7], "color": "#f7f7f7"},
-                    {"range": [actual_total * 0.7, actual_total], "color": "#d9f2ff"},
+                    {"range": [0, gauge_max * 0.7], "color": "#f7f7f7"},
+                    {"range": [gauge_max * 0.7, gauge_max], "color": "#d9f2ff"},
                 ],
                 "threshold": {
                     "line": {"color": "red", "width": 3},
                     "thickness": 0.75,
-                    "value": actual_total
+                    "value": estimate
                 }
             }
         ))
 
-        fig.update_layout(height=250, margin=dict(l=20, r=20, t=40, b=10))
+        fig.update_layout(height=250, margin=dict(l=30, r=30, t=40, b=10))
 
         st.metric(
             label="Estimate vs Actual",
