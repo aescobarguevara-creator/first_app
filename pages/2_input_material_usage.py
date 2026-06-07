@@ -57,12 +57,6 @@ def load_data():
     # Comments
     df["Comments"] = df["Comments"].fillna("").astype(str)
 
-    # Dates
-    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
-
-    # Unique group key
-    # df["Key"] = (df["Work Unit"] != df["Work Unit"].shift()).cumsum()
-
     return df
 
 
