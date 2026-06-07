@@ -580,15 +580,18 @@ for i, row in summary.iterrows():
 
     with col:
 
+        st.markdown(
+            f"""
+            <div style='text-align: center; font-size: 16px; font-weight: 600; margin-bottom: 5px;'>
+                {material} ({units})
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
             value=actual_to_date,
-            title={
-                "text": (
-                    f"<b>{material}</b><br>"
-                    f"<span style='font-size:10px;color:gray'>{units}</span>"
-                )
-            },
             gauge={
                 "axis": {
                     "range": [0, max(gauge_max, 1)],
@@ -608,12 +611,12 @@ for i, row in summary.iterrows():
             }
         ))
 
-        fig.update_layout(height=280, margin=dict(l=30, r=30, t=50, b=10))
+        fig.update_layout(height=280, margin=dict(l=30, r=30, t=40, b=10))
 
-        st.metric(
-            label="Estimate vs Actual",
-            value=f"{pct_diff:.1f}%"
-        )
+        # st.metric(
+        #     label="Estimate vs Actual",
+        #     value=f"{pct_diff:.1f}%"
+        # )
 
         st.plotly_chart(fig, use_container_width=True)
 
