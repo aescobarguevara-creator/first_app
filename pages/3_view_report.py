@@ -576,7 +576,7 @@ for i, row in summary.iterrows():
 
     col = cols[i % 3]
 
-    gauge_max = max(estimate, actual_total)
+    gauge_max = max(estimate, actual_total,1)
 
     with col:
 
@@ -612,7 +612,7 @@ for i, row in summary.iterrows():
 
         st.plotly_chart(fig, use_container_width=True)
 
-st.write(summary.head())
+st.write(summary)
 
 
 # Run local
