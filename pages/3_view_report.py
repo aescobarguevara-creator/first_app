@@ -109,7 +109,6 @@ date_lookup = (
     df_progress[
         ["Key", "Rule of Credit", "Date","LE - Cost code"]
     ]
-    .dropna(subset=["Date"])
     .drop_duplicates(
         subset=["Key", "Rule of Credit"]
     )
