@@ -107,7 +107,7 @@ df_materials = load_material_data()
 
 date_lookup = (
     df_progress[
-        ["Key", "Rule of Credit", "Date"]
+        ["Key", "Rule of Credit", "Date","LE - Cost code"]
     ]
     .dropna(subset=["Date"])
     .drop_duplicates(
@@ -207,8 +207,8 @@ df_materials_filtered = df_materials[
     (df_materials["Project"] == project) &
     (df_materials["Discipline"] == discipline) &
     (df_materials["Area"] == area) &
-    (df_materials["Task"] == task)
-    # (df_materials["M - Cost code"].isin(cost_code))
+    (df_materials["Task"] == task) &
+    (df_materials["LE - Cost code"].isin(cost_code))
 ]
 
 # Intermediate dfs are only needed to populate filter options, so we can clean them up to save memory
